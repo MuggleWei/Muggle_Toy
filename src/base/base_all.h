@@ -6,5 +6,6 @@
 #include "base/file_utility.h"
 #include "base/string_convert.h"
 #include "base/dll.h"
+#include "base/str_utils.h"
 
 #endif

@@ -15,8 +15,11 @@ int main(int argc, char* argv[])
 	}
 
 	// hello command line
-	cmd_line.append("-Mode SingleTest ");
-	cmd_line.append("-Render D3D11 ");
+	cmd_line.append("--Mode SingleTest ");
+	cmd_line.append("--RenderType D3D11 ");
+	cmd_line.append("--project hello ");
+	cmd_line.append("--lockfps.type Timer_Lock ");
+	cmd_line.append("--lockfps.value 33.333333");
 
 	_muggle_main_(cmd_line.c_str());
 

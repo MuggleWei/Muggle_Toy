@@ -13,7 +13,7 @@ void ExportFailure(const char* cond, const char* file_name, int line, const char
 	char buf[MG_MAX_PATH];
 	vsnprintf(buf, MG_MAX_PATH, format, args);
 
-	MLOG("Assertion failed: %s. %s, %d. %s\n", cond, file_name, line, buf);
+	MLOG("[%s: %d] Assertion failed: %s. %s\n", file_name, line, cond, buf);
 
 #if MG_PLATFORM_WINDOWS
 	__debugbreak();

@@ -23,32 +23,20 @@ public:
     double GetElapsedMilliseconds();
 
 	// static 
-    static double DeltaTime() 
-	{
-		return s_delta; 
-	}
-    static double FixedDeltaTime() 
-	{
-		return s_fixed_delta; 
-	}
+	static void Tick();
+	static double DeltaTime();
+	static double FixedDeltaTime();
 
-    static double GetLockDeltaTime() 
-	{
-		return s_lock_delta; 
-	}
-	static bool IsLockDelta()
-	{
-		return s_lock_delta > 0.0;
-	}
+	static double GetLockDeltaTime();
+	static bool IsLockDelta();
 
 	/*
 	 *  whether or not lock delta time
 	 *  @lock_delta: if lock_delta <= 0.0, not lock, otherwise, lock delta time
 	 */
-    static void LockDelta(double lock_delta) 
-	{
-		s_lock_delta = lock_delta; 
-	}    
+	static void LockDelta(double lock_delta);
+
+	static double GetLastTickTime();
 
 	/*
 	 *  Get elapsed from last reset in milliseconds
@@ -64,6 +52,7 @@ protected:
     static double s_delta;
     static double s_fixed_delta;
     static double s_lock_delta;
+	static double s_current_time;
 
 public:
     const static double fps_60_delta;

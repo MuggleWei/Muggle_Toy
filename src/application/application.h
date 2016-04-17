@@ -3,16 +3,43 @@
 
 #include "base/base.h"
 #include "render/render_info.h"
-#include <vector>
+#include <string>
+
+typedef void (*App_SingleTestCallbackPtr)();
 
 NS_MUGGLE_BEGIN
 
+// application type
 #define FOREACH_ENUM_APP_TYPE(_) \
 	_(SingleTest)
-ENUM_STRUCT_DEFINE(AppType, FOREACH_ENUM_APP_TYPE)
+ENUM_STRUCT(AppType, FOREACH_ENUM_APP_TYPE)
+
+// when app type is single test, must exsit function
+#define FOREACH_ENUM_SINGLE_TEST_CALLBACK(_) \
+	_(Init) \
+	_(Update) \
+	_(Render)
+ENUM_STRUCT(SingleTestCallback, FOREACH_ENUM_SINGLE_TEST_CALLBACK)
+
+// set fps lock type
+#define FOREACH_ENUM_LOCK_FPS_TYPE(_) \
+	_(None) \
+	_(Timer_Lock) \
+	_(API_Lock)
+ENUM_STRUCT(LockFpsType, FOREACH_ENUM_LOCK_FPS_TYPE)
+
+class Window;
 
 class Application
 {
+public:
+	static Application* GetSingleton()
+	{
+		return singleton;
+	}
+private:
+	static Application* singleton;
+
 public:
 	MG_DLL Application();
 	MG_DLL ~Application();
@@ -22,20 +49,41 @@ public:
 	Application& operator=(const Application&) = delete;
 	Application& operator=(const Application&&) = delete;
 
-	MG_DLL void ParseCmdLine(const char* cmd_line);
+	MG_DLL const char* getAppName();
+
+	MG_DLL bool ParseCmdLine(const char* cmd_line);
 
 	MG_DLL bool Initialize();
 	MG_DLL void Destroy();
 	MG_DLL void Run();
 
 protected:
-	bool LoadDll();
+	bool LoadSingleTestDll();
+
+	bool InitWindow();
+	void DestroyWindow();
+
+	void HandleLockFps(double last_time);
+	void HandleFixedUpdate(double& ref_accumulate_time);
+
+	void Update();
+	void FixUpdate();
+	void Render();
 
 protected:
+	// window
+	Window* m_win;
+
+	// status variable
 	AppType::Enum m_app_type;
 	RenderType::Enum m_render_type;
+	LockFpsType::Enum m_lock_fps_type;
+	double m_lock_fps_value;
 
-	std::vector<void*> m_dlls;
+	// AppType: SingleTest
+	std::string m_project_name;
+	void* m_project_dll;
+	App_SingleTestCallbackPtr m_st_callback[SingleTestCallback::Enum::Max];
 };
 
 NS_MUGGLE_END

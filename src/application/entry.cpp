@@ -11,7 +11,7 @@ MG_DLL int _muggle_main_(const char* cmd_line)
 #endif	
 
 	// create application object
-	MLOG("Create Application object\n");
+	MLOG("## Create Application object\n");
 	muggle::Application *app = new muggle::Application;
 	if (app == nullptr)
 	{
@@ -23,7 +23,7 @@ MG_DLL int _muggle_main_(const char* cmd_line)
 	app->ParseCmdLine(cmd_line);
 
 	// initialize application object
-	MLOG("Initialize Application object\n");
+	MLOG("## Initialize Application object\n");
 	bool result = app->Initialize();
 	if (!result)
 	{
@@ -32,11 +32,11 @@ MG_DLL int _muggle_main_(const char* cmd_line)
 	}
 
 	// run application
-	MLOG("Run Application\n");
+	MLOG("## Run Application\n");
 	app->Run();
 
 	// destroy application
-	MLOG("Destroy Application\n");
+	MLOG("## Destroy Application\n");
 	app->Destroy();
 	SAFE_DELETE(app);
 

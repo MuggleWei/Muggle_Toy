@@ -11,6 +11,7 @@ HightPrecisionTime Timer::s_init_time;
 double Timer::s_delta = 0.0;
 double Timer::s_fixed_delta = fps_60_delta;
 double Timer::s_lock_delta = fps_60_delta;
+double Timer::s_current_time = 0.0;
 
 #if MG_PLATFORM_WINDOWS
 
@@ -71,5 +72,39 @@ double Timer::s_lock_delta = fps_60_delta;
     }
 
 #endif
+
+void Timer::Tick()
+{
+	double last_time = s_current_time;
+	s_current_time = GetMilliseconds();
+	s_delta = s_current_time - last_time;
+}
+double Timer::DeltaTime()
+{
+	return s_delta;
+}
+double Timer::FixedDeltaTime()
+{
+	return s_fixed_delta;
+}
+
+double Timer::GetLockDeltaTime()
+{
+	return s_lock_delta;
+}
+bool Timer::IsLockDelta()
+{
+	return s_lock_delta > 0.0;
+}
+
+void Timer::LockDelta(double lock_delta)
+{
+	s_lock_delta = lock_delta;
+}
+
+double Timer::GetLastTickTime()
+{
+	return s_current_time;
+}
 
 NS_MUGGLE_END
