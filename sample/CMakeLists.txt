@@ -90,7 +90,7 @@ function(sample_code name)
 		)
 	endif()
 	target_link_libraries(${name}
-		${muggle_all_exclude_app}
+		${muggle_all}
 	)
 	set_target_properties(${name} PROPERTIES 
 		COMPILE_DEFINITIONS MG_USE_DLL

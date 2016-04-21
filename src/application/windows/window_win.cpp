@@ -56,7 +56,7 @@ bool Window::Initialize(Application* attached_app)
 	g_win = this;
 	m_attached_app = attached_app;
 
-	MultiByteToWideChar(CP_UTF8, 0, Application::GetSingleton()->getAppName(), -1, m_window_info.app_name, MG_MAX_PATH);
+	MultiByteToWideChar(CP_UTF8, 0, GetApplication()->getAppName(), -1, m_window_info.app_name, MG_MAX_PATH);
 	m_window_info.hInstance = GetModuleHandle(NULL);
 
 	// Setup the windows class with default settings.

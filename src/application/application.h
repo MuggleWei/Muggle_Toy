@@ -29,17 +29,13 @@ ENUM_STRUCT(SingleTestCallback, FOREACH_ENUM_SINGLE_TEST_CALLBACK)
 ENUM_STRUCT(LockFpsType, FOREACH_ENUM_LOCK_FPS_TYPE)
 
 class Window;
+class Renderer;
+class Application;
+
+MG_DLL Application* GetApplication();
 
 class Application
 {
-public:
-	static Application* GetSingleton()
-	{
-		return singleton;
-	}
-private:
-	static Application* singleton;
-
 public:
 	MG_DLL Application();
 	MG_DLL ~Application();
@@ -57,11 +53,19 @@ public:
 	MG_DLL void Destroy();
 	MG_DLL void Run();
 
+	MG_DLL Renderer* getRenderer()
+	{
+		return m_renderer;
+	}
+
 protected:
 	bool LoadSingleTestDll();
 
 	bool InitWindow();
 	void DestroyWindow();
+
+	bool InitRenderer();
+	void DestroyRenderer();
 
 	void HandleLockFps(double last_time);
 	void HandleFixedUpdate(double& ref_accumulate_time);
@@ -73,6 +77,9 @@ protected:
 protected:
 	// window
 	Window* m_win;
+
+	// renderer
+	Renderer* m_renderer;
 
 	// status variable
 	AppType::Enum m_app_type;

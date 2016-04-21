@@ -14,7 +14,9 @@ EXTERN_C_END
 class MG_DLL Hello
 {
 public:
-	void Print();
+	void Init();
+	void Update();
+	void Render();
 };
 
 #endif

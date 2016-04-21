@@ -3,6 +3,13 @@ file(GLOB SOURCE_C ${CMAKE_CURRENT_SOURCE_DIR}/*.c)
 file(GLOB SOURCE_CPP ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
 if (WIN32)
+	include_directories(
+		$ENV{DXSDK_DIR}Include
+	)
+	link_directories(
+		$ENV{DXSDK_DIR}Lib/${MG_ARCHITECTURE}
+	)
+
 	add_library(${muggle_render_lib} ${MG_LIB_TYPE}
 		${HEADER}
 		${SOURCE_C}
@@ -17,6 +24,6 @@ endif()
 set_target_properties(${muggle_render_lib} PROPERTIES 
 	COMPILE_DEFINITIONS "${MG_LIB_MACRO}")
 target_link_libraries(${muggle_render_lib}
-	${base_lib}
+	${muggle_base_lib}
 	${muggle_utility_lib}
 )

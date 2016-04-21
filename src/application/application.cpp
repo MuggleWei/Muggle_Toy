@@ -5,10 +5,16 @@
 #include "utility/scope_time.h"
 #include "window.h"
 #include "input.h"
+#include "renderer.h"
 
 NS_MUGGLE_BEGIN
 
-Application* Application::singleton = nullptr;
+static Application* s_app = nullptr;
+
+Application* GetApplication()
+{
+	return s_app;
+}
 
 Application::Application()
 {
@@ -172,12 +178,14 @@ bool Application::ParseCmdLine(const char* cmd_line)
 
 bool Application::Initialize()
 {
-	Application::singleton = this;
+	s_app = this;
 
 	switch (m_app_type)
 	{
 	case AppType::Enum::SingleTest:
 	{
+		bool result = true;
+
 		// load project dll
 		if (!LoadSingleTestDll())
 		{
@@ -186,12 +194,15 @@ bool Application::Initialize()
 		}
 
 		// initialize window
-		bool result = InitWindow();
+		result = InitWindow();
 		if (!result)
 		{
 			MASSERT_MSG(0, "Failed init window");
 			return false;
 		}
+
+		// initialize renderer
+		result = InitRenderer();
 
 		// init project
 		(*m_st_callback[SingleTestCallback::Init])();
@@ -213,10 +224,15 @@ void Application::Destroy()
 			m_project_dll = nullptr;
 		}
 
+		// destroy renderer
+		DestroyRenderer();
+
 		// destroy window
 		DestroyWindow();
 	}break;
 	}
+
+	s_app = nullptr;
 }
 void Application::Run()
 {
@@ -344,6 +360,47 @@ void Application::DestroyWindow()
 	}
 }
 
+bool Application::InitRenderer()
+{
+	m_renderer = CreateRenderer(m_render_type);
+	if (m_renderer == nullptr)
+	{
+		MASSERT_MSG(0, "Failed in create renderer object");
+		return false;
+	}
+
+	// fill out RenderInitParameter
+	RenderInitParameter param;
+	WindowInfo win_info = m_win->getWinInfo();
+	param.hWnd = (void*)win_info.hWnd;
+	param.full_screen = win_info.full_screen;
+	if (m_lock_fps_type == LockFpsType::Enum::API_Lock)
+	{
+		param.vsync = true;
+	}
+	param.win_width = win_info.width;
+	param.win_height = win_info.height;
+	param.rt_format = ImageFormat::Enum::IMAGE_FMT_RGBA8_UNORM;
+
+	bool result = m_renderer->Initialize(param);
+	if (!result)
+	{
+		MASSERT_MSG(0, "Failed in initialize renderer object");
+		return false;
+	}
+
+	return true;
+}
+void Application::DestroyRenderer()
+{
+	if (m_renderer)
+	{
+		m_renderer->Destroy();
+		delete m_renderer;
+		m_renderer = nullptr;
+	}
+}
+
 void Application::HandleLockFps(double last_time)
 {
 	SCOPE_TIME_COUNT(lock_fps);
@@ -379,17 +436,32 @@ void Application::HandleFixedUpdate(double& accumulate_time)
 void Application::Update()
 {
 	SCOPE_TIME_COUNT(update);
-	// MLOG("update: %f\n", Timer::DeltaTime());
+	switch (m_app_type)
+	{
+	case AppType::Enum::SingleTest:
+	{
+		(*m_st_callback[SingleTestCallback::Update])();
+	}break;
+	}
 }
 void Application::FixUpdate()
 {
 	SCOPE_TIME_COUNT(FixUpdate);
-	// MLOG("fixed update: %f\n", Timer::FixedDeltaTime());
 }
 void Application::Render()
 {
 	SCOPE_TIME_COUNT(Render);
-	// MLOG("Render\n");
+	switch (m_app_type)
+	{
+	case AppType::Enum::SingleTest:
+	{
+		m_renderer->BeginScene();
+
+		(*m_st_callback[SingleTestCallback::Render])();
+
+		m_renderer->EndScene();
+	}break;
+	}
 }
 
 NS_MUGGLE_END

@@ -1,20 +1,29 @@
 #include "hello.h"
-#include "utility/string_utils.h"
+#include "application/application.h"
+#include "render/renderer.h"
+
+static Hello s_hello;
 
 MG_DLL void Init()
 {
-	// MLOG("Init");
+	s_hello.Init();
 }
 MG_DLL void Update()
 {
-	// MLOG("Update");
+	s_hello.Update();
 }
 MG_DLL void Render()
 {
-	// MLOG("Render");
+	s_hello.Render();
 }
 
-void Hello::Print()
+void Hello::Init()
 {
-	// MLOG("Hello::Print");
+	muggle::Application* app = muggle::GetApplication();
+	muggle::Renderer* renderer = app->getRenderer();
+	renderer->setClearColor(muggle::vec4f(0.3f, 0.3f, 0.3f, 0.3f));
 }
+void Hello::Update()
+{}
+void Hello::Render()
+{}

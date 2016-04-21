@@ -39,6 +39,11 @@ public:
 	bool Initialize(Application* attached_app);
 	void Destroy();
 
+	WindowInfo& getWinInfo()
+	{
+		return m_window_info;
+	}
+
 #if MG_PLATFORM_WINDOWS
 	LRESULT MessageLoop(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 #endif
