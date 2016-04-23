@@ -28,6 +28,9 @@ print "## Destination resources directory:",res_dst_dir
 # verify source resources directory exists
 if not os.path.exists(res_src_dir):
     print "## Source resource directory is not exists"
+    if os.path.exists(res_dst_dir):
+        print "## Remove destination directory",res_dst_dir
+        shutil.rmtree(res_dst_dir)
     quit(0)
 
 # ensure destination directory exists
