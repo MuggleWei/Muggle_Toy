@@ -76,6 +76,6 @@ for f in src_files:
     else:
         src_mtime = os.path.getmtime(src_f)
         dst_mtime = os.path.getmtime(dst_f)
-        if src_mtime - dst_mtime > 1:
+        if abs(src_mtime - dst_mtime) > 1:
             print "update " + dst_f
             shutil.copy2(src_f, dst_f)
