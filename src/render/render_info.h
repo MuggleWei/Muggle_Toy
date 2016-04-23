@@ -6,6 +6,7 @@
 NS_MUGGLE_BEGIN
 
 #define FOREACH_ENUM_RENDER_TYPE(_) \
+	_(Vulkan) \
 	_(OpenGL) \
 	_(D3D11)
 ENUM_STRUCT(RenderType, FOREACH_ENUM_RENDER_TYPE)

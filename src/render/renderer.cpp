@@ -19,6 +19,10 @@ Renderer* CreateRenderer(RenderType::Enum render_type)
 		{
 			return new Renderer_D3D11();
 		}break;
+		default:
+		{
+			MASSERT_MSG(0, "RenderType %s does not support", RenderType::EnumToString(render_type));
+		}break;
 #endif
 	}
 
