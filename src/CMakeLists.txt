@@ -46,7 +46,12 @@ include_directories(
 	utility
 	render
 	application
+	dependencies/glad/include
 )
+
+# include dependencies 
+set(glad_lib glad)
+add_subdirectory(dependencies)
 
 # all subdirectory
 set(muggle_base_lib base)

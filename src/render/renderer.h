@@ -12,6 +12,7 @@ class Renderer
 public:
 	MG_DLL Renderer()
 	{
+		m_hWnd = nullptr;
 		m_vsync = false;
 		m_width = 0;
 		m_height = 0;
@@ -25,12 +26,21 @@ public:
 	Renderer& operator=(const Renderer&) = delete;
 	Renderer& operator=(const Renderer&&) = delete;
 
-	MG_DLL virtual bool Initialize(const RenderInitParameter& init_param) = 0;
+	MG_DLL virtual bool Initialize(const RenderInitParameter& init_param) = 0
+	{
+		m_hWnd = init_param.hWnd;
+		m_vsync = init_param.vsync;
+		m_width = init_param.win_width;
+		m_height = init_param.win_height;
+		m_full_screen = init_param.full_screen;
+
+		return true;
+	}
 	MG_DLL virtual void Destroy() = 0;
 	MG_DLL virtual void BeginScene() = 0;
 	MG_DLL virtual void EndScene() = 0;
 
-	MG_DLL void setClearColor(const vec4f& color)
+	MG_DLL virtual void setClearColor(const vec4f& color)
 	{
 		m_clear_color = color;
 	}
@@ -38,6 +48,7 @@ public:
 protected:
 	RenderType::Enum m_render_type;
 
+	void* m_hWnd;
 	bool m_vsync;
 	int m_width;
 	int m_height;

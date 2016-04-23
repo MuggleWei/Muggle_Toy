@@ -1,5 +1,13 @@
 #include "renderer_d3d11.h"
 
+/////////////
+// LINKING //
+/////////////
+#pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "d3dx11.lib")
+#pragma comment(lib, "d3dx10.lib")
+
 NS_MUGGLE_BEGIN
 
 DXGI_FORMAT MG_IMG_FMT_TO_DXGI[ImageFormat::Enum::Max] =
@@ -31,13 +39,11 @@ bool Renderer_D3D11::Initialize(const RenderInitParameter& init_param)
 {
 	MLOG("## Initialize d3d11\n");
 
+	// initialize parent member variable
+	Renderer::Initialize(init_param);
+
 	// initialize member variable
-	m_hWnd = (HWND)init_param.hWnd;
-	m_vsync = init_param.vsync;
 	m_dxgi_format = MG_IMG_FMT_TO_DXGI[init_param.rt_format];
-	m_width = init_param.win_width;
-	m_height = init_param.win_height;
-	m_full_screen = init_param.full_screen;
 	
 	// retrieve hardware information
 	if (!RetrieveHardwareInfo())
@@ -331,7 +337,7 @@ bool Renderer_D3D11::InitDeviceAndSwapChain()
 
 	// create device and swap chain
 	UINT flags = 0;
-#if !NDEBUG
+#if MUGGLE_DEBUG
 	flags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 	result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, flags, &m_feature_level, 1,
@@ -473,7 +479,7 @@ void Renderer_D3D11::FilloutSwapChainDesc(DXGI_SWAP_CHAIN_DESC& swap_chain_desc)
 		swap_chain_desc.BufferDesc.RefreshRate.Denominator = 1;
 	}
 	swap_chain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;	// usage of the back buffer
-	swap_chain_desc.OutputWindow = m_hWnd;							// window handle
+	swap_chain_desc.OutputWindow = (HWND)m_hWnd;					// window handle
 	swap_chain_desc.SampleDesc.Count = 1;							// turn multisampling off
 	swap_chain_desc.SampleDesc.Quality = 0;
 	// whether or not full screen

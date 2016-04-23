@@ -20,7 +20,7 @@ Application::Application()
 {
 	m_win = nullptr;
 
-	m_app_type = AppType::Enum::SingleTest;
+	m_app_type = AppType::Enum::RawTest;
 	m_render_type = RenderType::Enum::D3D11;
 	m_lock_fps_type = LockFpsType::Enum::None;
 	m_lock_fps_value = 16.666667;
@@ -34,7 +34,7 @@ Application::~Application()
 
 const char* Application::getAppName()
 {
-	if (m_app_type == AppType::Enum::SingleTest)
+	if (m_app_type == AppType::Enum::RawTest)
 	{
 		return m_project_name.c_str();
 	}
@@ -182,7 +182,7 @@ bool Application::Initialize()
 
 	switch (m_app_type)
 	{
-	case AppType::Enum::SingleTest:
+	case AppType::Enum::RawTest:
 	{
 		bool result = true;
 
@@ -215,7 +215,7 @@ void Application::Destroy()
 {
 	switch (m_app_type)
 	{
-	case AppType::Enum::SingleTest:
+	case AppType::Enum::RawTest:
 	{
 		// destroy project
 		if (m_project_dll != nullptr)
@@ -438,7 +438,7 @@ void Application::Update()
 	SCOPE_TIME_COUNT(update);
 	switch (m_app_type)
 	{
-	case AppType::Enum::SingleTest:
+	case AppType::Enum::RawTest:
 	{
 		(*m_st_callback[SingleTestCallback::Update])();
 	}break;
@@ -453,7 +453,7 @@ void Application::Render()
 	SCOPE_TIME_COUNT(Render);
 	switch (m_app_type)
 	{
-	case AppType::Enum::SingleTest:
+	case AppType::Enum::RawTest:
 	{
 		m_renderer->BeginScene();
 

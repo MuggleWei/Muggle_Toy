@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
 	// hello command line
 	cmd_line.append("--Mode RawTest ");
 	cmd_line.append("--RenderType OpenGL ");
-	cmd_line.append("--project hello ");
+	cmd_line.append("--project opengl_hello ");
 	cmd_line.append("--lockfps.type Timer_Lock ");
 	cmd_line.append("--lockfps.value 33.333333");
 

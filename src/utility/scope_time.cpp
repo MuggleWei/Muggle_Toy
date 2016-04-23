@@ -11,8 +11,6 @@ void ScopeTimeManager::Reset()
 
     if (datas_.size() > 0)
     {
-        int size = datas_.size();
-
         double sum = datas_[datas_.size() - 1].elapsed_time_;
 
         for (int index = (int)datas_.size() - 1; index >= 0;)

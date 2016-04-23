@@ -35,6 +35,104 @@ else()
 	set(MG_ARCHITECTURE x86)
 endif()
 
-# add subdirectory
+# option
+option(MUGGLE_TOY_BUILD_SAMPLE "Build sample code" ON)
+option(MUGGLE_TOY_BUILD_LEARN "Build learn code" ON)
+
+# add muggle toy libs
 add_subdirectory(src)
-add_subdirectory(sample)
+
+# set muggle toy path and dll name
+set(MUGGLE_TOY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(muggle_base base)
+set(muggle_math math)
+set(muggle_utility utility)
+set(muggle_render render)
+set(muggle_application application)
+
+set(sample_include_dir
+	${MUGGLE_TOY_PATH}
+	${MUGGLE_TOY_PATH}/${muggle_base}
+	${MUGGLE_TOY_PATH}/${muggle_math}
+	${MUGGLE_TOY_PATH}/${muggle_utility}
+	${MUGGLE_TOY_PATH}/${muggle_render}
+	${MUGGLE_TOY_PATH}/${muggle_application}
+	${MUGGLE_TOY_PATH}/dependencies/glad/include
+)
+
+# all muggle toy lib
+set(muggle_all_exclude_app
+	${muggle_base}
+	${muggle_utility}
+	${muggle_render}
+)
+set(muggle_all
+	${muggle_all_exclude_app}
+	${muggle_application}
+)
+
+# function for add sample code
+function(sample_code name folder_name)
+	file(GLOB ${name}_H ${name}/*.h)
+	file(GLOB ${name}_C ${name}/*.c)
+	file(GLOB ${name}_CPP ${name}/*.cpp)
+	
+	# exclude main cpp file
+	set(${name}_Dll_CPP "")
+	foreach (TMP_PATH ${${name}_CPP})
+		string (FIND ${TMP_PATH} main.cpp Exclude_File_Found)
+		if (NOT ${Exclude_File_Found} EQUAL -1)
+			list(REMOVE_ITEM ${name}_CPP ${TMP_PATH})
+		endif ()
+	endforeach(TMP_PATH)
+	
+	# add shared lib
+	if (WIN32)
+		add_library(${name} SHARED
+			${${name}_H}
+			${${name}_C}
+			${${name}_CPP}
+		)
+	else()
+		add_library(${name} SHARED
+			${${name}_C}
+			${${name}_CPP}
+		)
+	endif()
+	target_include_directories(${name} PUBLIC
+		${sample_include_dir}
+	)
+	target_link_libraries(${name}
+		${muggle_all}
+	)
+	set_target_properties(${name} PROPERTIES 
+		COMPILE_DEFINITIONS MG_USE_DLL
+		PREFIX lib
+		OUTPUT_NAME ${name})
+	
+	# add entry executable
+	add_executable(${name}_Entry
+		${name}/main.cpp
+	)
+	target_include_directories(${name}_Entry PUBLIC
+		${sample_include_dir}
+	)
+	target_link_libraries(${name}_Entry
+		${muggle_all}
+		${name}
+	)
+	
+	set_target_properties(
+		${name} ${name}_Entry
+		PROPERTIES
+		FOLDER "${folder_name}/${name}"
+	)
+endfunction(sample_code) 
+
+# add sample and learn code
+if (${MUGGLE_TOY_BUILD_SAMPLE})
+	add_subdirectory(sample)
+endif()
+if (${MUGGLE_TOY_BUILD_LEARN})
+	add_subdirectory(learn)
+endif()

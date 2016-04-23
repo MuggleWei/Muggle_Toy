@@ -16,4 +16,4 @@ else()
 endif()	
 set_target_properties(${muggle_utility_lib} PROPERTIES 
 	COMPILE_DEFINITIONS "${MG_LIB_MACRO}")
-target_link_libraries(${muggle_utility_lib} ${base_lib})
+target_link_libraries(${muggle_utility_lib} ${muggle_base_lib})

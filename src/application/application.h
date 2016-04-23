@@ -11,7 +11,7 @@ NS_MUGGLE_BEGIN
 
 // application type
 #define FOREACH_ENUM_APP_TYPE(_) \
-	_(SingleTest)
+	_(RawTest)
 ENUM_STRUCT(AppType, FOREACH_ENUM_APP_TYPE)
 
 // when app type is single test, must exsit function
@@ -87,7 +87,7 @@ protected:
 	LockFpsType::Enum m_lock_fps_type;
 	double m_lock_fps_value;
 
-	// AppType: SingleTest
+	// AppType: RawTest
 	std::string m_project_name;
 	void* m_project_dll;
 	App_SingleTestCallbackPtr m_st_callback[SingleTestCallback::Enum::Max];
