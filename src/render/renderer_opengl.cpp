@@ -2,6 +2,7 @@
 #include "glad/glad.h"
 
 #if MG_PLATFORM_WINDOWS
+#include "GL/wglext.h"
 #pragma comment(lib, "Opengl32.lib")
 #pragma comment(lib, "glu32.lib")
 #endif
@@ -40,13 +41,6 @@ bool Renderer_OpenGL::Initialize(const RenderInitParameter& init_param)
 #else
 #endif
 
-	// initialize glad
-	if (!gladLoadGL()) 
-	{
-		MASSERT_MSG(0, "Failed initialize glad");
-		return false;
-	}
-
 	// retrieve hardware and opengl information
 	const GLubyte *renderer = glGetString(GL_RENDERER);
 	const GLubyte *vendor = glGetString(GL_VENDOR);
@@ -84,6 +78,24 @@ void Renderer_OpenGL::setClearColor(const vec4f& color)
 {
 	Renderer::setClearColor(color);
 	glClearColor(color.x, color.y, color.z, color.w);
+}
+
+bool Renderer_OpenGL::ExtensionSupported(const char* extension_name)
+{
+	// get extensions
+	const GLubyte* extensions = glGetString(GL_EXTENSIONS);
+	if (extensions == nullptr)
+	{
+		MASSERT_MSG(0, "Failed get GL_EXTENSIONS");
+		return false;
+	}
+
+	if (strstr((const char*)extensions, extension_name) == nullptr)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 #if MG_PLATFORM_WINDOWS
@@ -132,6 +144,36 @@ bool Renderer_OpenGL::Initialize_Windows(const RenderInitParameter& init_param)
 		return false;
 	}
 	wglMakeCurrent((HDC)m_hdc, (HGLRC)m_hglrc);
+
+	// initialize glad
+	if (!gladLoadGL())
+	{
+		MASSERT_MSG(0, "Failed initialize glad");
+		return false;
+	}
+
+	// verify swap interval support
+	if (!ExtensionSupported("WGL_EXT_swap_control"))
+	{
+		MASSERT_MSG(0, "Can't find WGL_EXT_swap_control in GL Extension supported");
+		return false;
+	}
+	wglSwapIntervalEXT = (void*)wglGetProcAddress("wglSwapIntervalEXT");
+	if (wglSwapIntervalEXT == nullptr)
+	{
+		MASSERT_MSG(0, "Don't support wglSwapIntervalEXT");
+		return false;
+	}
+
+	// set vsync
+	if (init_param.vsync)
+	{
+		((PFNWGLSWAPINTERVALEXTPROC)wglSwapIntervalEXT)(1);
+	}
+	else
+	{
+		((PFNWGLSWAPINTERVALEXTPROC)wglSwapIntervalEXT)(0);
+	}
 
 	return true;
 }

@@ -22,7 +22,8 @@ Application::Application()
 
 	m_app_type = AppType::Enum::RawTest;
 	m_render_type = RenderType::Enum::D3D11;
-	m_lock_fps_type = LockFpsType::Enum::None;
+	m_vsync = false;
+	m_lock_fps = false;
 	m_lock_fps_value = 16.666667;
 
 	m_project_dll = nullptr;
@@ -133,23 +134,53 @@ bool Application::ParseCmdLine(const char* cmd_line)
 			}
 			m_project_name = args[i];
 		}
-		else if (strcmp(args[i], "--lockfps.type") == 0)
+		else if (strcmp(args[i], "--vsync") == 0)
 		{
 			++i;
 			if (i >= args.size())
 			{
-				MASSERT_MSG(0, "Failed parse command in option --lockfps.type");
+				MASSERT_MSG(0, "Failed parse command in option --lockfps");
 				parse_result = false;
 				break;
 			}
-			LockFpsType::Enum enum_index = LockFpsType::StringToEnum(args[i]);
-			if (enum_index == LockFpsType::Enum::Max)
+			if (strcmp(args[i], "on") == 0)
 			{
-				MASSERT_MSG(0, "--lockfps.type %s is not exist enumerator", args[i]);
+				m_vsync = true;
+			}
+			else if (strcmp(args[i], "off") == 0)
+			{
+				m_vsync = false;
+			}
+			else
+			{
+				MASSERT_MSG(0, "--vsync %s is not a valid command", args[i]);
 				parse_result = false;
 				break;
 			}
-			m_lock_fps_type = enum_index;
+		}
+		else if (strcmp(args[i], "--lockfps") == 0)
+		{
+			++i;
+			if (i >= args.size())
+			{
+				MASSERT_MSG(0, "Failed parse command in option --lockfps");
+				parse_result = false;
+				break;
+			}
+			if (strcmp(args[i], "on") == 0)
+			{
+				m_lock_fps = true;
+			}
+			else if (strcmp(args[i], "off") == 0)
+			{
+				m_lock_fps = false;
+			}
+			else
+			{
+				MASSERT_MSG(0, "--lockfps %s is not a valid command", args[i]);
+				parse_result = false;
+				break;
+			}
 		}
 		else if (strcmp(args[i], "--lockfps.value") == 0)
 		{
@@ -244,9 +275,13 @@ void Application::Run()
 	ZeroMemory(&msg, sizeof(MSG));
 
 	// lock fps
-	if (m_lock_fps_type == LockFpsType::Enum::Timer_Lock)
+	if (m_lock_fps)
 	{
 		Timer::LockDelta(m_lock_fps_value);
+	}
+	else
+	{
+		Timer::LockDelta(-1.0);
 	}
 
 	// timer ready
@@ -284,7 +319,7 @@ void Application::Run()
 			// calculate time
 			Timer::Tick();
 			last_time = Timer::GetLastTickTime();
-			accumulate_time += Timer::DeltaTime();			
+			accumulate_time += Timer::DeltaTime();
 
 			// Otherwise do the frame processing.
 			if (Input::GetKeyUp(eKeyCode::Escape))
@@ -374,10 +409,7 @@ bool Application::InitRenderer()
 	WindowInfo win_info = m_win->getWinInfo();
 	param.hWnd = (void*)win_info.hWnd;
 	param.full_screen = win_info.full_screen;
-	if (m_lock_fps_type == LockFpsType::Enum::API_Lock)
-	{
-		param.vsync = true;
-	}
+	param.vsync = m_vsync;
 	param.win_width = win_info.width;
 	param.win_height = win_info.height;
 	param.rt_format = ImageFormat::Enum::IMAGE_FMT_RGBA8_UNORM;
@@ -435,6 +467,7 @@ void Application::HandleFixedUpdate(double& accumulate_time)
 
 void Application::Update()
 {
+	// MLOG("%f\n", Timer::DeltaTime());
 	SCOPE_TIME_COUNT(update);
 	switch (m_app_type)
 	{

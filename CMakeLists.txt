@@ -57,6 +57,7 @@ set(sample_include_dir
 	${MUGGLE_TOY_PATH}/${muggle_utility}
 	${MUGGLE_TOY_PATH}/${muggle_render}
 	${MUGGLE_TOY_PATH}/${muggle_application}
+	${MUGGLE_TOY_PATH}/dependencies
 	${MUGGLE_TOY_PATH}/dependencies/glad/include
 )
 

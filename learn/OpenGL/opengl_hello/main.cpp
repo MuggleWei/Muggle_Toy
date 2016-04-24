@@ -18,7 +18,8 @@ int main(int argc, char* argv[])
 	cmd_line.append("--Mode RawTest ");
 	cmd_line.append("--RenderType OpenGL ");
 	cmd_line.append("--project opengl_hello ");
-	cmd_line.append("--lockfps.type Timer_Lock ");
+	cmd_line.append("--vsync on ");
+	cmd_line.append("--lockfps off ");
 	cmd_line.append("--lockfps.value 33.333333");
 
 	_muggle_main_(cmd_line.c_str());

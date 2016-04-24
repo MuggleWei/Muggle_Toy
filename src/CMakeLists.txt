@@ -46,6 +46,7 @@ include_directories(
 	utility
 	render
 	application
+	dependencies
 	dependencies/glad/include
 )
 

@@ -21,13 +21,6 @@ ENUM_STRUCT(AppType, FOREACH_ENUM_APP_TYPE)
 	_(Render)
 ENUM_STRUCT(SingleTestCallback, FOREACH_ENUM_SINGLE_TEST_CALLBACK)
 
-// set fps lock type
-#define FOREACH_ENUM_LOCK_FPS_TYPE(_) \
-	_(None) \
-	_(Timer_Lock) \
-	_(API_Lock)
-ENUM_STRUCT(LockFpsType, FOREACH_ENUM_LOCK_FPS_TYPE)
-
 class Window;
 class Renderer;
 class Application;
@@ -84,7 +77,8 @@ protected:
 	// status variable
 	AppType::Enum m_app_type;
 	RenderType::Enum m_render_type;
-	LockFpsType::Enum m_lock_fps_type;
+	bool m_vsync;
+	bool m_lock_fps;
 	double m_lock_fps_value;
 
 	// AppType: RawTest
