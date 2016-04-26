@@ -3,9 +3,12 @@
 
 #include "base/base.h"
 #include "render/render_info.h"
+#include "render/shader_obj.h"
 #include "math/vector4.h"
 
 NS_MUGGLE_BEGIN
+
+class ShaderProgram;
 
 class Renderer
 {
@@ -20,6 +23,11 @@ public:
 		m_clear_color = vec4f(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 	MG_DLL virtual ~Renderer() {}
+
+	RenderType::Enum getType()
+	{
+		return m_render_type;
+	}
 
 	Renderer(const Renderer&) = delete;
 	Renderer(const Renderer&&) = delete;
@@ -44,6 +52,8 @@ public:
 	{
 		m_clear_color = color;
 	}
+
+	MG_DLL virtual void setShader(const ShaderProgram* shader_program) = 0;
 
 protected:
 	RenderType::Enum m_render_type;

@@ -19,12 +19,16 @@ public:
 
 	MG_DLL virtual void setClearColor(const vec4f& color) override;
 
+	MG_DLL virtual void setShader(const ShaderProgram* shader_program) override;
+
 protected:
 	bool ExtensionSupported(const char* extension_name);
 
 #if MG_PLATFORM_WINDOWS
 	bool Initialize_Windows(const RenderInitParameter& init_param);
 	void Destroy_Windows();
+	bool CreateSimpleContext_Windows(const RenderInitParameter& init_param, void* p_pfd);
+	bool CreateProperContext_Windows(const RenderInitParameter& init_param, void* p_pfd);
 #else
 #endif
 
@@ -33,6 +37,7 @@ protected:
 	void* m_hdc;
 	void* m_hglrc;
 	void* wglSwapIntervalEXT;
+	void* wglGetExtensionsStringEXT;
 #endif
 };
 

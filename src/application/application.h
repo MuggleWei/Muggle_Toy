@@ -5,7 +5,7 @@
 #include "render/render_info.h"
 #include <string>
 
-typedef void (*App_SingleTestCallbackPtr)();
+typedef void (*App_RawTestCallbackPtr)();
 
 NS_MUGGLE_BEGIN
 
@@ -15,11 +15,12 @@ NS_MUGGLE_BEGIN
 ENUM_STRUCT(AppType, FOREACH_ENUM_APP_TYPE)
 
 // when app type is single test, must exsit function
-#define FOREACH_ENUM_SINGLE_TEST_CALLBACK(_) \
+#define FOREACH_ENUM_RAW_TEST_CALLBACK(_) \
 	_(Init) \
 	_(Update) \
-	_(Render)
-ENUM_STRUCT(SingleTestCallback, FOREACH_ENUM_SINGLE_TEST_CALLBACK)
+	_(Render) \
+	_(Destroy)
+ENUM_STRUCT(RawTestCallback, FOREACH_ENUM_RAW_TEST_CALLBACK)
 
 class Window;
 class Renderer;
@@ -52,7 +53,7 @@ public:
 	}
 
 protected:
-	bool LoadSingleTestDll();
+	bool LoadRawTestDll();
 
 	bool InitWindow();
 	void DestroyWindow();
@@ -77,6 +78,8 @@ protected:
 	// status variable
 	AppType::Enum m_app_type;
 	RenderType::Enum m_render_type;
+	int m_render_version_major;
+	int m_render_version_minor;
 	bool m_vsync;
 	bool m_lock_fps;
 	double m_lock_fps_value;
@@ -84,7 +87,7 @@ protected:
 	// AppType: RawTest
 	std::string m_project_name;
 	void* m_project_dll;
-	App_SingleTestCallbackPtr m_st_callback[SingleTestCallback::Enum::Max];
+	App_RawTestCallbackPtr m_st_callback[RawTestCallback::Enum::Max];
 };
 
 NS_MUGGLE_END

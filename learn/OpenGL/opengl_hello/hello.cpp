@@ -3,7 +3,7 @@
 #include "render/renderer.h"
 #include "glad/glad.h"
 
-MG_DLL void Init()
+void Init()
 {
 	muggle::Application* app = muggle::GetApplication();
 	muggle::Renderer* renderer = app->getRenderer();
@@ -15,9 +15,11 @@ MG_DLL void Init()
 		return;
 	}
 }
-MG_DLL void Update()
+void Update()
 {}
-MG_DLL void Render()
+void Render()
 {
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 }
+void Destroy()
+{}

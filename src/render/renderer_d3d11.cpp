@@ -165,6 +165,11 @@ void Renderer_D3D11::EndScene()
 	}
 }
 
+void Renderer_D3D11::setShader(const ShaderProgram* shader_program)
+{
+	// TODO: 
+}
+
 bool Renderer_D3D11::RetrieveHardwareInfo()
 {
 	MLOG("## retrieve hardware render information: \n");

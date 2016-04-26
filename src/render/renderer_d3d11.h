@@ -26,6 +26,8 @@ public:
 	MG_DLL virtual void BeginScene() override;
 	MG_DLL virtual void EndScene() override;
 
+	MG_DLL virtual void setShader(const ShaderProgram* shader_program) override;
+
 protected:
 	bool RetrieveHardwareInfo();
 	bool InitDeviceAndSwapChain();

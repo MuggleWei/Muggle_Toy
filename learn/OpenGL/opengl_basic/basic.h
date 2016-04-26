@@ -1,5 +1,5 @@
-#ifndef __OPENGL_HELLO_H__
-#define __OPENGL_HELLO_H__
+#ifndef __OPENGL_BASIC_H__
+#define __OPENGL_BASIC_H__
 
 #include "base/base.h"
 
@@ -9,6 +9,9 @@ MG_DLL void Init();
 MG_DLL void Update();
 MG_DLL void Render();
 MG_DLL void Destroy();
+
+void PrepareData();
+void PrepareShader();
 
 EXTERN_C_END
 

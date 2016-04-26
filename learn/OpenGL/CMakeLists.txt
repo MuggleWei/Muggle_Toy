@@ -1,6 +1,3 @@
-# add samples
-sample_code(opengl_hello Learn/OpenGL)
-
 # resources
 file(GLOB_RECURSE LearnOpenGLRes ${CMAKE_CURRENT_SOURCE_DIR}/res_learn_opengl/*.*)
 
@@ -22,3 +19,7 @@ add_custom_target(FAKE_LearnOpenGL ALL
 	COMMAND ${custom_consistent_res_command} ${CMAKE_CURRENT_SOURCE_DIR}/res_learn_opengl ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/res_learn_opengl
 )
 endif()
+
+# add samples
+sample_code(opengl_hello Learn/OpenGL)
+sample_code(opengl_basic Learn/OpenGL)

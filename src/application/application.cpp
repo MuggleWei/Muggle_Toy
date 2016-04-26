@@ -22,6 +22,8 @@ Application::Application()
 
 	m_app_type = AppType::Enum::RawTest;
 	m_render_type = RenderType::Enum::D3D11;
+	m_render_version_major = 0;
+	m_render_version_minor = 0;
 	m_vsync = false;
 	m_lock_fps = false;
 	m_lock_fps_value = 16.666667;
@@ -123,6 +125,40 @@ bool Application::ParseCmdLine(const char* cmd_line)
 			}
 			m_render_type = enum_index;
 		}
+		else if (strcmp(args[i], "--RenderVersion.major") == 0)
+		{
+			++i;
+			if (i >= args.size())
+			{
+				MASSERT_MSG(0, "Failed parse command in option --RenderVersion.major");
+				parse_result = false;
+				break;
+			}
+			if (!StringUtils::IsNumber(args[i]))
+			{
+				MASSERT_MSG(0, "--RenderVersion.major %s need number", args[i]);
+				parse_result = false;
+				break;
+			}
+			m_render_version_major = StringUtils::ToInt(args[i]);
+		}
+		else if (strcmp(args[i], "--RenderVersion.minor") == 0)
+		{
+			++i;
+			if (i >= args.size())
+			{
+				MASSERT_MSG(0, "Failed parse command in option --RenderVersion.minor");
+				parse_result = false;
+				break;
+			}
+			if (!StringUtils::IsNumber(args[i]))
+			{
+				MASSERT_MSG(0, "--RenderVersion.minor %s need number", args[i]);
+				parse_result = false;
+				break;
+			}
+			m_render_version_minor = StringUtils::ToInt(args[i]);
+		}
 		else if (strcmp(args[i], "--project") == 0)
 		{
 			++i;
@@ -218,7 +254,7 @@ bool Application::Initialize()
 		bool result = true;
 
 		// load project dll
-		if (!LoadSingleTestDll())
+		if (!LoadRawTestDll())
 		{
 			MASSERT(0);
 			return false;
@@ -236,7 +272,7 @@ bool Application::Initialize()
 		result = InitRenderer();
 
 		// init project
-		(*m_st_callback[SingleTestCallback::Init])();
+		(*m_st_callback[RawTestCallback::Init])();
 	}break;
 	}
 	
@@ -251,6 +287,8 @@ void Application::Destroy()
 		// destroy project
 		if (m_project_dll != nullptr)
 		{
+			(*m_st_callback[RawTestCallback::Destroy])();
+
 			Dll_Free(m_project_dll);
 			m_project_dll = nullptr;
 		}
@@ -342,21 +380,21 @@ void Application::Run()
 	return;
 }
 
-bool Application::LoadSingleTestDll()
+bool Application::LoadRawTestDll()
 {
 	std::string dll_path = "./lib" + m_project_name;
 	const char* tmp = dll_path.c_str();
-	void* dll = DLL_Load(tmp);
-	if (dll == nullptr)
+	m_project_dll = DLL_Load(tmp);
+	if (m_project_dll == nullptr)
 	{
 		MASSERT_MSG(0, "Failed in load: %s dynamic lib", tmp);
 		return false;
 	}
 
-	for (size_t i = 0; i < SingleTestCallback::Max; i++)
+	for (size_t i = 0; i < RawTestCallback::Max; i++)
 	{
-		const char* func_name = SingleTestCallback::EnumToString((SingleTestCallback::Enum)i);
-		m_st_callback[i] = (App_SingleTestCallbackPtr)Dll_QueryFunc(dll, func_name);
+		const char* func_name = RawTestCallback::EnumToString((RawTestCallback::Enum)i);
+		m_st_callback[i] = (App_RawTestCallbackPtr)Dll_QueryFunc(m_project_dll, func_name);
 		if (m_st_callback[i] == nullptr)
 		{
 			MASSERT_MSG(0, "Failed in query funcion: %s in %s dynamic lib", func_name, tmp);
@@ -406,6 +444,7 @@ bool Application::InitRenderer()
 
 	// fill out RenderInitParameter
 	RenderInitParameter param;
+	memset(&param, 0, sizeof(param));
 	WindowInfo win_info = m_win->getWinInfo();
 	param.hWnd = (void*)win_info.hWnd;
 	param.full_screen = win_info.full_screen;
@@ -413,6 +452,8 @@ bool Application::InitRenderer()
 	param.win_width = win_info.width;
 	param.win_height = win_info.height;
 	param.rt_format = ImageFormat::Enum::IMAGE_FMT_RGBA8_UNORM;
+	param.version_major = m_render_version_major;
+	param.version_minor = m_render_version_minor;
 
 	bool result = m_renderer->Initialize(param);
 	if (!result)
@@ -473,7 +514,7 @@ void Application::Update()
 	{
 	case AppType::Enum::RawTest:
 	{
-		(*m_st_callback[SingleTestCallback::Update])();
+		(*m_st_callback[RawTestCallback::Update])();
 	}break;
 	}
 }
@@ -490,7 +531,7 @@ void Application::Render()
 	{
 		m_renderer->BeginScene();
 
-		(*m_st_callback[SingleTestCallback::Render])();
+		(*m_st_callback[RawTestCallback::Render])();
 
 		m_renderer->EndScene();
 	}break;

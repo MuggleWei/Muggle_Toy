@@ -4,18 +4,20 @@
 
 static Hello s_hello;
 
-MG_DLL void Init()
+void Init()
 {
 	s_hello.Init();
 }
-MG_DLL void Update()
+void Update()
 {
 	s_hello.Update();
 }
-MG_DLL void Render()
+void Render()
 {
 	s_hello.Render();
 }
+void Destroy()
+{}
 
 void Hello::Init()
 {

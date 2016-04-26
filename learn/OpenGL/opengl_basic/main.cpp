@@ -17,10 +17,9 @@ int main(int argc, char* argv[])
 	// hello command line
 	cmd_line.append("--Mode RawTest ");
 	cmd_line.append("--RenderType OpenGL ");
-	// Uncomment this for specify a version your want
-//	cmd_line.append("--RenderVersion.major 4 ");
-//	cmd_line.append("--RenderVersion.minor 0 ");
-	cmd_line.append("--project opengl_hello ");
+	cmd_line.append("--RenderVersion.major 4 ");
+	cmd_line.append("--RenderVersion.minor 4 ");
+	cmd_line.append("--project opengl_basic ");
 	cmd_line.append("--vsync on ");
 	cmd_line.append("--lockfps off ");
 	cmd_line.append("--lockfps.value 33.333333");

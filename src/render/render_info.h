@@ -11,6 +11,18 @@ NS_MUGGLE_BEGIN
 	_(D3D11)
 ENUM_STRUCT(RenderType, FOREACH_ENUM_RENDER_TYPE)
 
+#define FOREACH_ENUM_SHADER_TYPE(_) \
+	_(GLSL) \
+	_(HLSL) \
+	_(Cg)
+ENUM_STRUCT(ShaderType, FOREACH_ENUM_SHADER_TYPE)
+
+#define FOREACH_ENUM_SHADER_STAGE_TYPE(_) \
+	_(VS) \
+	_(PS) \
+	_(CS)
+ENUM_STRUCT(ShaderStageType, FOREACH_ENUM_SHADER_STAGE_TYPE)
+
 #define FOREACH_ENUM_IMAGE_FORMAT(_) \
 	_(IMAGE_FMT_UNKNOWN) \
 	_(IMAGE_FMT_RGBA8_UNORM) \
@@ -25,6 +37,8 @@ struct RenderInitParameter
 	int win_width;
 	int win_height;
 	ImageFormat::Enum rt_format;
+	int version_major;
+	int version_minor;
 };
 
 enum eHardwareInfo
