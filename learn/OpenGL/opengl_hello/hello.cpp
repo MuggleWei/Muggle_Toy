@@ -18,8 +18,6 @@ void Init()
 void Update()
 {}
 void Render()
-{
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-}
+{}
 void Destroy()
 {}

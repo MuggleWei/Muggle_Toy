@@ -39,7 +39,7 @@ struct Quaternion
 	}
 };
 
-typedef Quaternion<float> Quat;
+typedef Quaternion<float> quatf;
 
 NS_MUGGLE_END
 

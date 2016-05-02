@@ -23,3 +23,5 @@ endif()
 # add samples
 sample_code(opengl_hello Learn/OpenGL)
 sample_code(opengl_basic Learn/OpenGL)
+sample_code(opengl_simple Learn/OpenGL)
+sample_code(opengl_fade_cycle Learn/OpenGL)

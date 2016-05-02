@@ -21,6 +21,8 @@ public:
 
 	void Attach(const ShaderObj* shader_obj);
 	bool Link();
+
+	bool OutputInformation();
 };
 
 NS_MUGGLE_END

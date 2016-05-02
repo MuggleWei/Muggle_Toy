@@ -36,7 +36,9 @@
 // assert
 #if MUGGLE_RELEASE
 #define MASSERT(x)
-#define MASSERT_MSG(x, msg, ...)
+#define MASSERT_MSG(x, format, ...)
+#define MERROR(x, format, ...)
+#define MWARNING(x, format, ...)
 #else
 #define MASSERT(x) \
 do \
@@ -52,6 +54,15 @@ do \
 	if (!(x)) \
 	{ \
 		ExportFailure(#x, __FILE__, __LINE__, format, ##__VA_ARGS__);  \
+	} \
+} while(0)
+#define MERROR(x, format, ...) MASSERT_MSG(x, format, ##__VA_ARGS__)
+#define MWARNING(x, format, ...) \
+do \
+{ \
+	if (!(x)) \
+	{ \
+		ExportWarning(#x, __FILE__, __LINE__, format, ##__VA_ARGS__);  \
 	} \
 } while(0)
 #endif
@@ -102,7 +113,7 @@ do \
 #endif
 
 // log
-#define MLOG(format, ...) LogFunction(format, ##__VA_ARGS__);
+#define MLOG(format, ...) LogFunction(format, ##__VA_ARGS__)
 
 // sleep
 #define MSleep(ms) SleepFunction(ms)
@@ -187,7 +198,8 @@ struct struct_name \
 EXTERN_C_BEGIN
 
 // function
-MG_DLL void ExportFailure(const char* cond, const char* file_name, int line, const char* msg, ...);
+MG_DLL void ExportWarning(const char* cond, const char* file_name, int line, const char* format, ...);
+MG_DLL void ExportFailure(const char* cond, const char* file_name, int line, const char* format, ...);
 MG_DLL void SleepFunction(unsigned long ms);
 MG_DLL void LogFunction(const char *format, ...);
 

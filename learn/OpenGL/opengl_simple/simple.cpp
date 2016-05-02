@@ -1,10 +1,12 @@
-#include "basic.h"
+#include "simple.h"
 #include "application/application.h"
 #include "render/renderer.h"
 #include "glad/glad.h"
 #include "utility/timer.h"
 #include "shader_obj.h"
 #include "shader_program_glsl.h"
+#include "math/matrix4x4.h"
+#include "math/quaternion.h"
 
 static muggle::Renderer* renderer = nullptr;
 static muggle::ShaderObj *vert_shader = nullptr, *frag_shader = nullptr;
@@ -12,6 +14,7 @@ static muggle::ShaderProgramGLSL shader_program;
 static GLuint vao_handle = 0;
 static GLuint vbo_handles[2] = { 0 };
 static GLuint num_vertex = 0;
+static float angle_radian = 0.0f;
 
 void Init()
 {
@@ -27,12 +30,20 @@ void Init()
 		return;
 	}
 
+	PrepareShader();
 	PrepareData();
-	PrepareShader();	
 }
 void Update()
 {
-	// MLOG("%f\n", muggle::Timer::DeltaTime());
+	angle_radian += 0.01f;
+	muggle::quatf quat = muggle::quatf::FromYawPitchRoll(0.0f, 0.0f, angle_radian);	
+	muggle::matrix4f rotate_mat = muggle::matrix4f::Rotate(quat);
+
+	GLuint location = glGetUniformLocation(shader_program.getHandle(), "RotationMatrix");
+	if (location >= 0)
+	{
+		glUniformMatrix4fv(location, 1, GL_TRUE, &rotate_mat.m[0][0]);
+	}
 }
 void Render()
 {
@@ -108,11 +119,11 @@ void PrepareShader()
 {
 	// create shader object
 	vert_shader = muggle::CreateShaderObj(
-		renderer, "res_learn_opengl/shaders/basic_vert.glsl", "main",
+		renderer, "res_learn_opengl/shaders/simple_vert.glsl", "main",
 		muggle::ShaderStageType::VS, muggle::ShaderType::GLSL
 	);
 	frag_shader = muggle::CreateShaderObj(
-		renderer, "res_learn_opengl/shaders/basic_frag.glsl", "main",
+		renderer, "res_learn_opengl/shaders/simple_frag.glsl", "main",
 		muggle::ShaderStageType::PS, muggle::ShaderType::GLSL
 	);
 
@@ -120,10 +131,6 @@ void PrepareShader()
 	shader_program.Initialize();
 	shader_program.Attach(vert_shader);
 	shader_program.Attach(frag_shader);
-
-	// bind shader input variable
-	glBindAttribLocation(shader_program.getHandle(), 0, "VertexPosition");
-	glBindAttribLocation(shader_program.getHandle(), 1, "VertexColor");
 
 	// link shader program
 	shader_program.Link();

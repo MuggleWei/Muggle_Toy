@@ -30,7 +30,7 @@ Application::Application()
 
 	m_project_dll = nullptr;
 	m_project_name = "";
-	memset(m_st_callback, 0, sizeof(m_st_callback));
+	memset(m_raw_test_callback, 0, sizeof(m_raw_test_callback));
 }
 Application::~Application()
 {}
@@ -272,7 +272,10 @@ bool Application::Initialize()
 		result = InitRenderer();
 
 		// init project
-		(*m_st_callback[RawTestCallback::Init])();
+		if (m_raw_test_callback[RawTestCallback::Init])
+		{
+			(*m_raw_test_callback[RawTestCallback::Init])();
+		}
 	}break;
 	}
 	
@@ -287,7 +290,10 @@ void Application::Destroy()
 		// destroy project
 		if (m_project_dll != nullptr)
 		{
-			(*m_st_callback[RawTestCallback::Destroy])();
+			if (m_raw_test_callback[RawTestCallback::Destroy])
+			{
+				(*m_raw_test_callback[RawTestCallback::Destroy])();
+			}			
 
 			Dll_Free(m_project_dll);
 			m_project_dll = nullptr;
@@ -394,11 +400,10 @@ bool Application::LoadRawTestDll()
 	for (size_t i = 0; i < RawTestCallback::Max; i++)
 	{
 		const char* func_name = RawTestCallback::EnumToString((RawTestCallback::Enum)i);
-		m_st_callback[i] = (App_RawTestCallbackPtr)Dll_QueryFunc(m_project_dll, func_name);
-		if (m_st_callback[i] == nullptr)
+		m_raw_test_callback[i] = (App_RawTestCallbackPtr)Dll_QueryFunc(m_project_dll, func_name);
+		if (m_raw_test_callback[i] == nullptr)
 		{
-			MASSERT_MSG(0, "Failed in query funcion: %s in %s dynamic lib", func_name, tmp);
-			return false;
+			MWARNING(0, "Failed in query funcion: %s in %s dynamic lib", func_name, tmp);
 		}
 	}
 
@@ -512,10 +517,14 @@ void Application::Update()
 	SCOPE_TIME_COUNT(update);
 	switch (m_app_type)
 	{
-	case AppType::Enum::RawTest:
-	{
-		(*m_st_callback[RawTestCallback::Update])();
-	}break;
+		case AppType::Enum::RawTest:
+		{
+			if (m_raw_test_callback[RawTestCallback::Update])
+			{
+				(*m_raw_test_callback[RawTestCallback::Update])();
+			}
+			
+		}break;
 	}
 }
 void Application::FixUpdate()
@@ -527,14 +536,17 @@ void Application::Render()
 	SCOPE_TIME_COUNT(Render);
 	switch (m_app_type)
 	{
-	case AppType::Enum::RawTest:
-	{
-		m_renderer->BeginScene();
+		case AppType::Enum::RawTest:
+		{
+			m_renderer->BeginScene();
 
-		(*m_st_callback[RawTestCallback::Render])();
+			if (m_raw_test_callback[RawTestCallback::Render])
+			{
+				(*m_raw_test_callback[RawTestCallback::Render])();
+			}		
 
-		m_renderer->EndScene();
-	}break;
+			m_renderer->EndScene();
+		}break;
 	}
 }
 

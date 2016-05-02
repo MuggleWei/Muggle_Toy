@@ -3,7 +3,7 @@
 
 /*
  *  base 3d math library
- *  left hand coordinate, row vectors, row matrix
+ *  left hand coordinate, row vectors, row-major order matrix
  */
 
 #include "base.h"

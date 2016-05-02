@@ -87,7 +87,7 @@ protected:
 	// AppType: RawTest
 	std::string m_project_name;
 	void* m_project_dll;
-	App_RawTestCallbackPtr m_st_callback[RawTestCallback::Enum::Max];
+	App_RawTestCallbackPtr m_raw_test_callback[RawTestCallback::Enum::Max];
 };
 
 NS_MUGGLE_END

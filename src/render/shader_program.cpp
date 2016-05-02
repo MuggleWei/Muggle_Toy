@@ -63,6 +63,91 @@ bool ShaderProgram::Link()
 		return false;
 	}
 
+#if MUGGLE_DEBUG
+	OutputInformation();
+#endif
+
+	return true;
+}
+
+bool ShaderProgram::OutputInformation()
+{
+	/*
+	if (gl_handle == 0)
+	{
+		return false;
+	}
+
+	GLint n_attribs, max_len_attris = 0;
+	GLint n_uniforms, max_len_uniforms = 0;
+	GLint n_uniform_blocks, max_len_uniform_blocks = 0;
+	glGetProgramiv(gl_handle, GL_ACTIVE_ATTRIBUTES, &n_attribs);
+	glGetProgramiv(gl_handle, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &max_len_attris);
+	glGetProgramiv(gl_handle, GL_ACTIVE_UNIFORMS, &n_uniforms);
+	glGetProgramiv(gl_handle, GL_ACTIVE_UNIFORM_MAX_LENGTH, &max_len_uniforms);
+	glGetProgramiv(gl_handle, GL_ACTIVE_UNIFORM_BLOCKS, &n_uniform_blocks);
+	glGetProgramiv(gl_handle, GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH, &max_len_uniform_blocks);
+
+	GLsizei max_length = max_len_attris > max_len_uniforms ? max_len_attris : max_len_uniforms;
+	max_length = max_length > max_len_uniform_blocks ? max_length : max_len_uniform_blocks;
+	GLchar* name = (GLchar*)malloc(max_length+1);
+
+	GLint size, location;
+	GLsizei length;
+	GLenum type;
+	GLint active_uniform_in_block;
+	MLOG("=============================\n");
+	MLOG("Shader Program info:\n");
+	for (GLint i = 0; i < n_attribs; ++i)
+	{
+		glGetActiveAttrib(
+			gl_handle, (GLuint)i, 
+			max_length, &length,
+			&size, &type, name);
+		location = glGetAttribLocation(gl_handle, name);
+		MLOG("Attribute: [location %d] %s %s;\n", location, ConvertGLTypeToString(type), name);
+	}
+	for (GLint i = 0; i < n_uniforms; ++i)
+	{
+		glGetActiveUniform(
+			gl_handle, (GLuint)i,
+			max_length, &length,
+			&size, &type, name);
+		location = glGetUniformLocation(gl_handle, name);
+		if (location == -1)
+		{
+			continue;
+		}
+		MLOG("Uniforms: [location %d] %s %s;\n", location, ConvertGLTypeToString(type), name);
+	}
+	for (GLint i = 0; i < n_uniform_blocks; ++i)
+	{
+		glGetActiveUniformBlockName(
+			gl_handle, (GLuint)i,
+			max_length, &length,
+			name);
+		glGetActiveUniformBlockiv(gl_handle, (GLuint)i, GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &active_uniform_in_block);
+		MLOG("Uniform block: [index %d] %s\n", i, name);
+		MLOG("{\n");
+		if (active_uniform_in_block > 0)
+		{
+			GLint* indices = (GLint*)malloc(active_uniform_in_block * sizeof(GLint));
+			glGetActiveUniformBlockiv(gl_handle, (GLuint)i, GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES, indices);
+			for (GLint j = 0; j < active_uniform_in_block; ++j)
+			{
+				glGetActiveUniform(
+					gl_handle, (GLuint)j,
+					max_length, &length,
+					&size, &type, name);
+				MLOG("\t%s %s;\n", ConvertGLTypeToString(type), name);
+			}
+			free(indices);
+		}
+		MLOG("};\n");
+	}
+
+	free(name);
+	*/
 	return true;
 }
 

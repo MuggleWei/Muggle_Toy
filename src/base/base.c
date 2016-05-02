@@ -5,6 +5,18 @@
 #include <unistd.h>
 #endif
 
+MG_DLL void ExportWarning(const char* cond, const char* file_name, int line, const char* format, ...)
+{
+	va_list args;
+	va_start(args, format);
+
+	char buf[MG_MAX_PATH];
+	vsnprintf(buf, MG_MAX_PATH, format, args);
+
+	MLOG("[%s: %d] Warning: %s. %s\n", file_name, line, cond, buf);
+
+	va_end(args);
+}
 void ExportFailure(const char* cond, const char* file_name, int line, const char* format, ...)
 {
 	va_list args;
