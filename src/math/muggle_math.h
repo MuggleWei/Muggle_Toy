@@ -7,10 +7,11 @@
  */
 
 #include "base.h"
-#include "math_utility.h"
+#include "math_base.h"
 #include "vector2.h"
 #include "vector3.h"
 #include "vector4.h"
+#include "matrix3x3.h"
 #include "matrix4x4.h"
 #include "quaternion.h"
 

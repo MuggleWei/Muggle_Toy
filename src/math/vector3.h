@@ -2,7 +2,7 @@
 #define __MUGGLE_VECTOR3_H__
 
 #include "base.h"
-#include "math_utility.h"
+#include "math_base.h"
 #include "vector2.h"
 
 NS_MUGGLE_BEGIN

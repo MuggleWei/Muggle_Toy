@@ -7,6 +7,7 @@
 #include "shader_program_glsl.h"
 #include "math/matrix4x4.h"
 #include "math/quaternion.h"
+#include "utility/math_utils.h"
 
 static muggle::Renderer* renderer = nullptr;
 static muggle::ShaderObj *vert_shader = nullptr, *frag_shader = nullptr;
@@ -37,7 +38,7 @@ void Update()
 {
 	angle_radian += 0.01f;
 	muggle::quatf quat = muggle::quatf::FromYawPitchRoll(0.0f, 0.0f, angle_radian);
-	muggle::matrix4f rotate_mat = muggle::matrix4f::Rotate(quat);
+	muggle::matrix4f rotate_mat = muggle::MathUtils::Rotate(quat);
 }
 void Render()
 {

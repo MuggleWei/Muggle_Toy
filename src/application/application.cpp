@@ -3,6 +3,7 @@
 #include "utility/string_utils.h"
 #include "utility/timer.h"
 #include "utility/scope_time.h"
+#include "utility/math_utils.h"
 #include "window.h"
 #include "input.h"
 #include "renderer.h"
@@ -252,6 +253,16 @@ bool Application::Initialize()
 	case AppType::Enum::RawTest:
 	{
 		bool result = true;
+
+		// intialize math rule
+		if (m_render_type == RenderType::Enum::D3D11)
+		{
+			SetMathUseGL(false);
+		}
+		else
+		{
+			SetMathUseGL(true);
+		}
 
 		// load project dll
 		if (!LoadRawTestDll())

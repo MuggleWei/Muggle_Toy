@@ -2,7 +2,7 @@
 #define __MUGGLE_QUATERNION_H__
 
 #include "base.h"
-#include "math_utility.h"
+#include "math_base.h"
 
 NS_MUGGLE_BEGIN
 
