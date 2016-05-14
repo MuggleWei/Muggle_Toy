@@ -160,11 +160,11 @@ struct Vector3
 		return (T)0;
 	}
 
-	T Dot(const Vector3<T>& v)
+	T Dot(const Vector3<T>& v) const
 	{
 		return x * v.x + y * v.y + z * v.z;
 	}
-	Vector3<T> Cross(const Vector3<T>& v)
+	Vector3<T> Cross(const Vector3<T>& v) const
 	{
 		return Vector3<T>(
 			y*v.z - z*v.y,

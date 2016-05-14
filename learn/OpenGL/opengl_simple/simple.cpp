@@ -8,6 +8,7 @@
 #include "math/matrix4x4.h"
 #include "math/quaternion.h"
 #include "utility/math_utils.h"
+#include "application/camera.h"
 
 static muggle::Renderer* renderer = nullptr;
 static muggle::ShaderObj *vert_shader = nullptr, *frag_shader = nullptr;
@@ -16,6 +17,7 @@ static GLuint vao_handle = 0;
 static GLuint vbo_handles[2] = { 0 };
 static GLuint num_vertex = 0;
 static float angle_radian = 0.0f;
+static muggle::Camera camera;
 
 void Init()
 {
@@ -33,23 +35,43 @@ void Init()
 
 	PrepareShader();
 	PrepareData();
+
+	// camera initialize
+	camera.Update();
 }
 void Update()
 {
-	angle_radian += 0.01f;
-	muggle::quatf quat = muggle::quatf::FromYawPitchRoll(0.0f, 0.0f, angle_radian);	
-	muggle::matrix4f rotate_mat = muggle::MathUtils::Rotate(quat);
-
-	GLuint location = glGetUniformLocation(shader_program.getHandle(), "RotationMatrix");
-	if (location >= 0)
-	{
-		glUniformMatrix4fv(location, 1, GL_FALSE, &rotate_mat.m[0][0]);
-	}
+	camera.Update();	
 }
 void Render()
 {
 	shader_program.Use();
+
 	glBindVertexArray(vao_handle);
+
+	muggle::matrix4f world_mat = muggle::matrix4f::identify;
+	GLuint location = glGetUniformLocation(shader_program.getHandle(), "WorldMatrix");
+	if (location >= 0)
+	{
+		glUniformMatrix4fv(location, 1, GL_FALSE, &world_mat.m[0][0]);
+	}
+
+	muggle::matrix4f view_mat;
+	muggle::matrix4f proj_mat;
+	location = glGetUniformLocation(shader_program.getHandle(), "ViewMatrix");
+	if (location >= 0)
+	{
+		view_mat = camera.getViewMatrix();
+		glUniformMatrix4fv(location, 1, GL_FALSE, &view_mat.m[0][0]);
+	}
+
+	location = glGetUniformLocation(shader_program.getHandle(), "ProjectionMatrix");
+	if (location >= 0)
+	{
+		proj_mat = camera.getProjectionMatrix();
+		glUniformMatrix4fv(location, 1, GL_FALSE, &proj_mat.m[0][0]);
+	}
+
 	glDrawArrays(GL_TRIANGLES, 0, num_vertex);
 }
 void Destroy()

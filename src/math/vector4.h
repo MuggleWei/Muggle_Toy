@@ -176,7 +176,7 @@ struct Vector4
 		return (T)0;
 	}
 
-	T Dot(const Vector4<T>& v)
+	T Dot(const Vector4<T>& v) const
 	{
 		return x * v.x + y * v.y + z * v.z + w * v.w;
 	}

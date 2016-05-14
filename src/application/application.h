@@ -52,6 +52,11 @@ public:
 		return m_renderer;
 	}
 
+	MG_DLL Window* getWindow()
+	{
+		return m_win;
+	}
+
 protected:
 	bool LoadRawTestDll();
 

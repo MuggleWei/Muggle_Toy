@@ -36,9 +36,6 @@ void Init()
 }
 void Update()
 {
-	angle_radian += 0.01f;
-	muggle::quatf quat = muggle::quatf::FromYawPitchRoll(0.0f, 0.0f, angle_radian);
-	muggle::matrix4f rotate_mat = muggle::MathUtils::Rotate(quat);
 }
 void Render()
 {

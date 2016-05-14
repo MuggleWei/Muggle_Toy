@@ -22,11 +22,6 @@ public:
 			v.x, v.y, v.z, 1.0
 			);
 
-		if (GetMathUseGL())
-		{
-			mat4 = mat4.Transpose();
-		}
-
 		return mat4;
 	}
 	template<typename T>
@@ -54,11 +49,6 @@ public:
 		mat4.m[2][3] = (T)0;
 		mat4.m[3][3] = (T)1;
 
-		if (GetMathUseGL())
-		{
-			mat4 = mat4.Transpose();
-		}
-
 		return mat4;
 	}
 	template<typename T>
@@ -74,41 +64,35 @@ public:
 	template<typename T>
 	static Matrix4x4<T> TRS(const Vector3<T>& pos, const Quaternion<T>& quat, const Vector3<T>& scale)
 	{
-		if (GetMathUseGL())
-		{
-			return Translate(pos, use_gl) * Rotate(quat, use_gl) * Scale(scale);
-		}
 		return Scale(scale) * Rotate(quat) * Translate(pos);
 	}
 
 	template<typename T>
 	static Matrix4x4<T> LookAt(const Vector3<T>& eye, const Vector3<T>& target, const Vector3<T>& up)
 	{
-		Vector3<T> forward, z_axis, x_axis, y_axis;
+		Vector3<T> z_axis, x_axis, y_axis;
 
-		forward = target - eye;
-		forward.Normalize();
+		z_axis = target - eye;
+		z_axis.Normalize();
 
-		y_axis = up;
-		y_axis.Normalize();
-
-		x_axis = y_axis.Cross(forward);
+		x_axis = up.Cross(z_axis);
 		x_axis.Normalize();
 
-		z_axis = x_axis.Cross(y_axis);
-		z_axis.Normalize();
+		y_axis = z_axis.Cross(x_axis);
+		y_axis.Normalize();
+
+		Vector3<T> nag_eye = -eye;
+		if (GetMathUseGL())
+		{
+			z_axis = -z_axis;
+		}
 
 		Matrix4x4<T> mat4 = Matrix4x4<T>(
 			x_axis.x, y_axis.x, z_axis.x, (T)0,
 			x_axis.y, y_axis.y, z_axis.y, (T)0,
 			x_axis.z, y_axis.z, z_axis.z, (T)0,
-			Vector3<T>::Dot(-eye, x_axis), Vector3<T>::Dot(-eye, y_axis), Vector3<T>::Dot(-eye, z_axis), (T)1
+			nag_eye.Dot(x_axis), nag_eye.Dot(y_axis), nag_eye.Dot(z_axis), (T)1
 			);
-
-		if (use_gl)
-		{
-			mat4 = mat4.Transpose();
-		}
 
 		return mat4;
 	}
@@ -123,7 +107,7 @@ public:
 		if (GetMathUseGL())
 		{
 			mat4.m[2][2] = (T)(-2) / (zFar - zNear);
-			mat4.m[2][3] = -(zFar + zNear) / (zFar - zNear);
+			mat4.m[3][2] = -(zFar + zNear) / (zFar - zNear);
 		}
 		else
 		{
@@ -138,24 +122,16 @@ public:
 	{
 		Matrix4x4<T> mat4 = Matrix4x4<T>::zero;
 
-		/*
-		T width = (T)2 * near * Math::Tan(fov * (T)0.5);
-		T height = width / aspect;
+		T tan_half_fov = Math::Tan(fov * (T)0.5);
 
-		mat4.m[0][0] = (T)2 * near / width;
-		mat4.m[1][1] = (T)2 * near / height;
-		*/
-		T width_optimize = Math::Tan(fov * (T)0.5);
-		T height_optimize = width_optimize / aspect;
-
-		mat4.m[0][0] = (T)1 / Math::Tan(fov * (T)0.5);
-		mat4.m[1][1] = (T)1 / height_optimize;
+		mat4.m[0][0] = (T)1 / (aspect * tan_half_fov);
+		mat4.m[1][1] = (T)1 / tan_half_fov;
 
 		if (GetMathUseGL())
 		{
 			mat4.m[2][2] = -(zFar + zNear) / (zFar - zNear);
-			mat4.m[2][3] = (T)(-2) * zFar * zNear / (zFar - zNear);
-			mat4.m[3][2] = (T)1;
+			mat4.m[2][3] = (T)-1;
+			mat4.m[3][2] = (T)(-2) * zFar * zNear / (zFar - zNear);
 		}
 		else
 		{

@@ -159,10 +159,12 @@ LRESULT Window::MessageLoop(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg)
 	{
 		case WM_KEYDOWN:
+		case WM_SYSKEYDOWN:
 		{
 			Input::SetKeyCode_Win((unsigned int)wParam, eButtonStatus::Press);
 		}break;
 		case WM_KEYUP:
+		case WM_SYSKEYUP:
 		{
 			Input::SetKeyCode_Win((unsigned int)wParam, eButtonStatus::Release);
 		}break;

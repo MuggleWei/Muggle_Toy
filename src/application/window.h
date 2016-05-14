@@ -43,6 +43,11 @@ public:
 	{
 		return m_window_info;
 	}
+	void getWinSize(int &w, int&h)
+	{
+		w = m_window_info.width;
+		h = m_window_info.height;
+	}
 
 #if MG_PLATFORM_WINDOWS
 	LRESULT MessageLoop(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
