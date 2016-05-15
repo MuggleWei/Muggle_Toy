@@ -59,6 +59,7 @@ public:
 	MG_DLL void setUniform(const char* name, const muggle::vec2f& v);
 	MG_DLL void setUniform(const char* name, const muggle::vec3f& v);
 	MG_DLL void setUniform(const char* name, const muggle::vec4f& v);
+	MG_DLL void setUniform(const char* name, const muggle::matrix3f& mat3);
 	MG_DLL void setUniform(const char* name, const muggle::matrix4f& mat4);
 	MG_DLL void setUniform(const char* name, float val);
 	MG_DLL void setUniform(const char* name, int val);

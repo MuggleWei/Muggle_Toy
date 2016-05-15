@@ -680,6 +680,25 @@ void ShaderProgramGLSL::setUniform(const char* name, const muggle::vec4f& v)
 		MWARNING(0, "%s's uniform location is invalid\n", name);
 	}
 }
+void ShaderProgramGLSL::setUniform(const char* name, const muggle::matrix3f& mat3)
+{
+	auto it = m_uniform_map.find(name);
+	if (it == m_uniform_map.end())
+	{
+		MWARNING(0, "Can't find uniform name: %s\n", name);
+		return;
+	}
+
+	GLSLVarInfo &var = it->second;
+	if (var.location >= 0)
+	{
+		glUniformMatrix3fv(var.location, 1, GL_FALSE, &mat3.mat[0]);
+	}
+	else
+	{
+		MWARNING(0, "%s's uniform location is invalid\n", name);
+	}
+}
 void ShaderProgramGLSL::setUniform(const char* name, const muggle::matrix4f& mat4)
 {
 	auto it = m_uniform_map.find(name);
@@ -692,7 +711,7 @@ void ShaderProgramGLSL::setUniform(const char* name, const muggle::matrix4f& mat
 	GLSLVarInfo &var = it->second;
 	if (var.location >= 0)
 	{
-		glUniformMatrix4fv(var.location, 1, GL_TRUE, &mat4.mat[0]);
+		glUniformMatrix4fv(var.location, 1, GL_FALSE, &mat4.mat[0]);
 	}
 	else
 	{

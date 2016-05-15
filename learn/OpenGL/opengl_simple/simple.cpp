@@ -50,27 +50,12 @@ void Render()
 	glBindVertexArray(vao_handle);
 
 	muggle::matrix4f world_mat = muggle::matrix4f::identify;
-	GLuint location = glGetUniformLocation(shader_program.getHandle(), "WorldMatrix");
-	if (location >= 0)
-	{
-		glUniformMatrix4fv(location, 1, GL_FALSE, &world_mat.m[0][0]);
-	}
+	muggle::matrix4f view_mat = camera.getViewMatrix();
+	muggle::matrix4f proj_mat = camera.getProjectionMatrix();;
 
-	muggle::matrix4f view_mat;
-	muggle::matrix4f proj_mat;
-	location = glGetUniformLocation(shader_program.getHandle(), "ViewMatrix");
-	if (location >= 0)
-	{
-		view_mat = camera.getViewMatrix();
-		glUniformMatrix4fv(location, 1, GL_FALSE, &view_mat.m[0][0]);
-	}
-
-	location = glGetUniformLocation(shader_program.getHandle(), "ProjectionMatrix");
-	if (location >= 0)
-	{
-		proj_mat = camera.getProjectionMatrix();
-		glUniformMatrix4fv(location, 1, GL_FALSE, &proj_mat.m[0][0]);
-	}
+	shader_program.setUniform("WorldMatrix", world_mat);
+	shader_program.setUniform("ViewMatrix", view_mat);
+	shader_program.setUniform("ProjectionMatrix", proj_mat);
 
 	glDrawArrays(GL_TRIANGLES, 0, num_vertex);
 }

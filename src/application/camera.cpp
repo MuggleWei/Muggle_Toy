@@ -21,7 +21,7 @@ Camera::Camera()
 	, m_aspect(1.333f)
 	, m_z_near(0.1f)
 	, m_z_far(1000.0f)
-	, m_move_speed(0.003f)
+	, m_move_speed(1.0f)
 	, m_rotate_speed(0.002f)
 	, m_drag_rotate_speed(0.005f)
 	, m_last_mouse_pos_x(0)
@@ -59,7 +59,7 @@ void Camera::Update()
 		RotateDirection((float)delta_x_pos, (float)-delta_y_pos);
 		m_dirty = true;
 	}
-	else if (Input::GetMouse(eMouseButton::Left))
+	if (Input::GetMouse(eMouseButton::Left))
 	{
 		if (Input::GetKey(eKeyCode::LAlt))
 		{
@@ -68,50 +68,48 @@ void Camera::Update()
 			m_dirty = true;
 		}
 	}
-	else if (Input::GetMouse(eMouseButton::Middle))
+	if (Input::GetMouse(eMouseButton::Middle))
 	{
 		// drag
 		Drag(delta_x_pos, -delta_y_pos);
 		m_dirty = true;
 	}
-	else
+	// move forward
+	if (Input::GetKey(eKeyCode::Up))
 	{
-		// move forward
-		if (Input::GetKey(eKeyCode::Up))
-		{
-			m_dirty = true;
-			m_position += m_direction * (float)delta_time * m_move_speed;
-			m_target_position += m_direction * (float)delta_time * m_move_speed;
-		}
-		// move backward
-		if (Input::GetKey(eKeyCode::Down))
-		{
-			m_dirty = true;
-			m_position -= m_direction * (float)delta_time * m_move_speed;
-			m_target_position -= m_direction * (float)delta_time * m_move_speed;
-		}
-		// move right
-		if (Input::GetKey(eKeyCode::Right))
-		{
-			m_dirty = true;
-			m_position += m_right * (float)delta_time * m_move_speed;
-			m_target_position += m_right * (float)delta_time * m_move_speed;
-		}
-		// move left
-		if (Input::GetKey(eKeyCode::Left))
-		{
-			m_dirty = true;
-			m_position -= m_right * (float)delta_time * m_move_speed;
-			m_target_position -= m_right * (float)delta_time * m_move_speed;;
-		}
-		// move forward
-		int16_t scroll = Input::GetMouseWheel();
-		if (scroll != 0)
-		{
-			m_dirty = true;
-			m_position += m_direction * (float)scroll * m_move_speed;
-			m_target_position += m_direction * (float)scroll * m_move_speed;
-		}		
+		m_dirty = true;
+		m_position += m_direction * (float)delta_time * m_move_speed;
+		m_target_position += m_direction * (float)delta_time * m_move_speed;
+	}
+	// move backward
+	if (Input::GetKey(eKeyCode::Down))
+	{
+		m_dirty = true;
+		m_position -= m_direction * (float)delta_time * m_move_speed;
+		m_target_position -= m_direction * (float)delta_time * m_move_speed;
+	}
+	// move right
+	if (Input::GetKey(eKeyCode::Right))
+	{
+		m_dirty = true;
+		m_position += m_right * (float)delta_time * m_move_speed;
+		m_target_position += m_right * (float)delta_time * m_move_speed;
+	}
+	// move left
+	if (Input::GetKey(eKeyCode::Left))
+	{
+		m_dirty = true;
+		m_position -= m_right * (float)delta_time * m_move_speed;
+		m_target_position -= m_right * (float)delta_time * m_move_speed;;
+	}
+	// move forward
+	int16_t scroll = Input::GetMouseWheel();
+	if (scroll != 0)
+	{
+		scroll = scroll > 0 ? 1 : -1;
+		m_dirty = true;
+		m_position += m_direction * (float)scroll * m_move_speed;
+		m_target_position += m_direction * (float)scroll * m_move_speed;
 	}
 
 	if (m_dirty)

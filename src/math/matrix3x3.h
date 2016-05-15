@@ -40,7 +40,7 @@ struct Matrix3x3
 		{
 			for (int j = 0; j < 3; ++j)
 			{
-				new_mat[i][j] = m[i][0] * matrix[0][j] + m[i][1] * matrix[1][j] + m[i][2] * matrix[2][j];
+				new_mat.m[i][j] = m[i][0] * matrix.m[0][j] + m[i][1] * matrix.m[1][j] + m[i][2] * matrix.m[2][j];
 			}
 		}
 
@@ -87,8 +87,7 @@ struct Matrix3x3
 	}
 	Matrix3x3<T> Adjugate() const
 	{
-		Matrix3 mat3_adj =
-		{
+		Matrix3x3<T> mat3_adj = Matrix3x3<T>(
 			mat[4] * mat[8] - mat[5] * mat[7],	// row 0
 			mat[5] * mat[6] - mat[3] * mat[8],
 			mat[3] * mat[7] - mat[4] * mat[6],
@@ -98,31 +97,45 @@ struct Matrix3x3
 			mat[1] * mat[5] - mat[2] * mat[4],	// row 2
 			mat[2] * mat[3] - mat[0] * mat[5],
 			mat[0] * mat[4] - mat[1] * mat[3]
-		};
+		);
 
 		return mat3_adj;
 	}
-	bool Inverse(Matrix3x3<T>& inv_mat) const
+	Matrix3x3<T> Inverse(bool *succeed = nullptr) const
 	{
 		T determinant = Determinant();
+		Matrix3x3<T> inv_mat;
 
 		if (Math::Equal(determinant, T(0)))
 		{
 			inv_mat = Matrix3x3<T>::identify;
-			return false;
+			if (succeed)
+			{
+				*succeed = false;
+			}
+			return inv_mat;
 		}
 
 		T inv_det = (T)1 / determinant;
 		if (Math::Equal(inv_det, T(0)))
 		{
 			inv_mat = Matrix3x3<T>::identify;
-			return false;
+			if (succeed)
+			{
+				*succeed = false;
+			}
+			return inv_mat;
 		}
 
 		Matrix3x3<T> mat3_adj = Adjugate();
 		inv_mat = mat3_adj * inv_det;
 
-		return true;
+		if (succeed)
+		{
+			*succeed = false;
+		}
+
+		return inv_mat;
 	}
 	Matrix3x3<T> Transpose() const
 	{
@@ -146,6 +159,15 @@ struct Matrix3x3
 			v.x * m[0][1] + v.y * m[1][1] + v.z * m[2][1],
 			v.x * m[0][2] + v.y * m[1][2] + v.z * m[2][2]
 			);
+	}
+
+	static Matrix3x3<T> Inverse(const Matrix3x3<T>& mat)
+	{
+		return mat.Inverse();
+	}
+	static Matrix3x3<T> Transpose(const Matrix3x3<T>& mat)
+	{
+		return mat.Transpose();
 	}
 };
 

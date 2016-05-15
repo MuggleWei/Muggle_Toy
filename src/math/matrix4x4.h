@@ -52,7 +52,7 @@ struct Matrix4x4
 		{
 			for (int j = 0; j < 4; ++j)
 			{
-				new_mat[i][j] = m[i][0] * matrix[0][j] + m[i][1] * matrix[1][j] + m[i][2] * matrix[2][j] + m[i][3] * matrix[3][j];
+				new_mat.m[i][j] = m[i][0] * matrix.m[0][j] + m[i][1] * matrix.m[1][j] + m[i][2] * matrix.m[2][j] + m[i][3] * matrix.m[3][j];
 			}
 		}
 
@@ -115,27 +115,40 @@ struct Matrix4x4
 
 		return mat4_adj;
 	}
-	bool Inverse(Matrix4x4<T>& inv_mat) const
+	Matrix4x4<T> Inverse(bool *succeed = nullptr) const
 	{
 		T determinant = Determinant();
+		Matrix4x4<T> inv_mat;
 
 		if (Math::Equal(determinant, T(0)))
 		{
 			inv_mat = Matrix4x4<T>::identify;
-			return false;
+			if (succeed)
+			{
+				*succeed = false;
+			}			
+			return inv_mat;
 		}
 
 		T inv_det = (T)1 / determinant;
 		if (Math::Equal(inv_det, T(0)))
 		{
 			inv_mat = Matrix4x4<T>::identify;
-			return false;
+			if (succeed)
+			{
+				*succeed = false;
+			}
+			return inv_mat;
 		}
 
 		Matrix4x4<T> mat4_adj = Adjugate();
 		inv_mat = mat4_adj * inv_det;
 
-		return true;
+		if (succeed)
+		{
+			*succeed = false;
+		}
+		return inv_mat;
 	}
 	Matrix4x4<T> Transpose() const
 	{
@@ -161,6 +174,15 @@ struct Matrix4x4
 			v.x * m[0][3] + v.y * m[1][3] + v.z * m[2][3] + v.w * m[3][3]
 		);
 	}	
+
+	static Matrix4x4<T> Inverse(const Matrix4x4<T>& mat)
+	{
+		return mat.Inverse();
+	}
+	static Matrix4x4<T> Transpose(const Matrix4x4<T>& mat)
+	{
+		return mat.Transpose();
+	}
 };
 
 template<typename T>
