@@ -88,15 +88,18 @@ struct Matrix3x3
 	Matrix3x3<T> Adjugate() const
 	{
 		Matrix3x3<T> mat3_adj = Matrix3x3<T>(
-			mat[4] * mat[8] - mat[5] * mat[7],	// row 0
-			mat[5] * mat[6] - mat[3] * mat[8],
-			mat[3] * mat[7] - mat[4] * mat[6],
-			mat[2] * mat[7] - mat[1] * mat[8],	// row 1
-			mat[0] * mat[8] - mat[2] * mat[6],
-			mat[1] * mat[6] - mat[0] * mat[7],
-			mat[1] * mat[5] - mat[2] * mat[4],	// row 2
-			mat[2] * mat[3] - mat[0] * mat[5],
-			mat[0] * mat[4] - mat[1] * mat[3]
+			mat[4] * mat[8] - mat[5] * mat[7], mat[2] * mat[7] - mat[1] * mat[8], mat[1] * mat[5] - mat[2] * mat[4],
+			mat[5] * mat[6] - mat[3] * mat[8], mat[0] * mat[8] - mat[2] * mat[6], mat[2] * mat[3] - mat[0] * mat[5],
+			mat[3] * mat[7] - mat[4] * mat[6], mat[1] * mat[6] - mat[0] * mat[7], mat[0] * mat[4] - mat[1] * mat[3]
+//			mat[4] * mat[8] - mat[5] * mat[7],	// row 0
+//			mat[5] * mat[6] - mat[3] * mat[8],
+//			mat[3] * mat[7] - mat[4] * mat[6],
+//			mat[2] * mat[7] - mat[1] * mat[8],	// row 1
+//			mat[0] * mat[8] - mat[2] * mat[6],
+//			mat[1] * mat[6] - mat[0] * mat[7],
+//			mat[1] * mat[5] - mat[2] * mat[4],	// row 2
+//			mat[2] * mat[3] - mat[0] * mat[5],
+//			mat[0] * mat[4] - mat[1] * mat[3]
 		);
 
 		return mat3_adj;

@@ -79,28 +79,26 @@ void Camera::Update()
 	{
 		m_dirty = true;
 		m_position += m_direction * (float)delta_time * m_move_speed;
-		m_target_position += m_direction * (float)delta_time * m_move_speed;
 	}
 	// move backward
 	if (Input::GetKey(eKeyCode::Down))
 	{
 		m_dirty = true;
 		m_position -= m_direction * (float)delta_time * m_move_speed;
-		m_target_position -= m_direction * (float)delta_time * m_move_speed;
 	}
 	// move right
 	if (Input::GetKey(eKeyCode::Right))
 	{
 		m_dirty = true;
 		m_position += m_right * (float)delta_time * m_move_speed;
-		m_target_position += m_right * (float)delta_time * m_move_speed;
+		// m_target_position += m_right * (float)delta_time * m_move_speed;
 	}
 	// move left
 	if (Input::GetKey(eKeyCode::Left))
 	{
 		m_dirty = true;
 		m_position -= m_right * (float)delta_time * m_move_speed;
-		m_target_position -= m_right * (float)delta_time * m_move_speed;;
+		// m_target_position -= m_right * (float)delta_time * m_move_speed;;
 	}
 	// move forward
 	int16_t scroll = Input::GetMouseWheel();
@@ -109,7 +107,6 @@ void Camera::Update()
 		scroll = scroll > 0 ? 1 : -1;
 		m_dirty = true;
 		m_position += m_direction * (float)scroll * m_move_speed;
-		m_target_position += m_direction * (float)scroll * m_move_speed;
 	}
 
 	if (m_dirty)
@@ -173,7 +170,7 @@ void Camera::UpdateMatrix()
 	m_aspect = (float)width / (float)height;
 	
 	m_view_matrix = MathUtils::LookAt(m_position, m_position + m_direction, m_up);
-	m_projection_matrix = MathUtils::Perspective(m_fov, m_aspect, m_z_near, m_z_far);
+	m_projection_matrix = MathUtils::Perspective(Math::DegreeToRad(m_fov), m_aspect, m_z_near, m_z_far);
 }
 
 void Camera::RotateDirection(float delta_x_pos, float delta_y_pos)
@@ -265,8 +262,8 @@ void Camera::Drag(double delta_x_pos, double delta_y_pos)
 	muggle::vec3f delta_y = m_up * factor * (float)delta_y_pos / (float)height;
 	m_position -= delta_x;
 	m_position -= delta_y;
-	m_target_position -= delta_x;
-	m_target_position -= delta_y;
+//	m_target_position -= delta_x;
+//	m_target_position -= delta_y;
 }
 
 NS_MUGGLE_END

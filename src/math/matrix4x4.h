@@ -105,13 +105,12 @@ struct Matrix4x4
 	}
 	Matrix4x4<T> Adjugate() const
 	{
-		Matrix4x4<T> mat4_adj =
-		{
-			Cofactor(0, 0), (T)-1 * Cofactor(0, 1), Cofactor(0, 2), (T)-1 * Cofactor(0, 3),
-			(T)-1 * Cofactor(1, 0), Cofactor(1, 1), (T)-1 * Cofactor(1, 2), Cofactor(1, 3),
-			Cofactor(2, 0), (T)-1 * Cofactor(2, 1), Cofactor(2, 2), (T)-1 * Cofactor(2, 3),
-			(T)-1 * Cofactor(3, 0), Cofactor(3, 1), (T)-1 * Cofactor(3, 2), Cofactor(3, 3)
-		};
+		Matrix4x4<T> mat4_adj = Matrix4x4<T>(
+			Cofactor(0, 0), (T)-1 * Cofactor(1, 0), Cofactor(2, 0), (T)-1 * Cofactor(3, 0),
+			(T)-1 * Cofactor(0, 1), Cofactor(1, 1), (T)-1 * Cofactor(2, 1), Cofactor(3, 1),
+			Cofactor(0, 2), (T)-1 * Cofactor(1, 2), Cofactor(2, 2), (T)-1 * Cofactor(3, 2),
+			(T)-1 * Cofactor(0, 3), Cofactor(1, 3), (T)-1 * Cofactor(2, 3), Cofactor(3, 3)
+		);
 
 		return mat4_adj;
 	}

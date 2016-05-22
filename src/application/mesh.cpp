@@ -47,6 +47,100 @@ MeshData::~MeshData()
 }
 
 /*************** GeometryMesh ***************/
+MeshData* GeometryMesh::GeneratePlane(float len, float width)
+{
+	float half_l = len / 2.0f;
+	float half_w = width / 2.0f;
+
+	// initialize mesh data
+	MeshData *p_mesh_data = new MeshData();
+	p_mesh_data->vertex_decl.Add(VertexAttribute::Position, 3, VertexAttributeType::Float);
+	p_mesh_data->vertex_decl.Add(VertexAttribute::Normal, 3, VertexAttributeType::Float);
+	p_mesh_data->vertex_decl.Add(VertexAttribute::TexCoord0, 2, VertexAttributeType::Float);
+
+	p_mesh_data->num_vertex = 4;
+	p_mesh_data->num_index = 6;
+	p_mesh_data->size_index = 2;
+	p_mesh_data->ptr_vertices = (intptr_t)malloc(p_mesh_data->vertex_decl.stride * p_mesh_data->num_vertex);
+	p_mesh_data->ptr_indices = (intptr_t)malloc(p_mesh_data->size_index * p_mesh_data->num_index);
+
+	// fill out mesh data
+	/*
+	 *	z & x
+	 *	(l, w)  2 - 1 (-l, w)
+	 *          | \ |
+	 *  (l, -w) 3 - 0 (-l, -w)
+	 */
+	float *pos, *norm, *tex_coord;
+	intptr_t p_vert;
+
+	// vertex 0
+	p_vert = p_mesh_data->ptr_vertices + 0 * p_mesh_data->vertex_decl.stride;
+	pos = (float*)(p_vert + p_mesh_data->vertex_decl.offsets[VertexAttribute::Position]);
+	norm = (float*)(p_vert + p_mesh_data->vertex_decl.offsets[VertexAttribute::Normal]);
+	tex_coord = (float*)(p_vert + p_mesh_data->vertex_decl.offsets[VertexAttribute::TexCoord0]);
+	pos[0] = -half_w;
+	pos[1] = 0.0f;
+	pos[2] = -half_l;
+	norm[0] = 0.0f;
+	norm[1] = 1.0f;
+	norm[2] = 0.0f;
+	tex_coord[0] = 1.0f;
+	tex_coord[1] = 0.0f;
+
+	// vertex 1
+	p_vert = p_mesh_data->ptr_vertices + 1 * p_mesh_data->vertex_decl.stride;
+	pos = (float*)(p_vert + p_mesh_data->vertex_decl.offsets[VertexAttribute::Position]);
+	norm = (float*)(p_vert + p_mesh_data->vertex_decl.offsets[VertexAttribute::Normal]);
+	tex_coord = (float*)(p_vert + p_mesh_data->vertex_decl.offsets[VertexAttribute::TexCoord0]);
+	pos[0] = half_w;
+	pos[1] = 0.0f;
+	pos[2] = -half_l;
+	norm[0] = 0.0f;
+	norm[1] = 1.0f;
+	norm[2] = 0.0f;
+	tex_coord[0] = 1.0f;
+	tex_coord[1] = 1.0f;
+
+	// vertex 2
+	p_vert = p_mesh_data->ptr_vertices + 2 * p_mesh_data->vertex_decl.stride;
+	pos = (float*)(p_vert + p_mesh_data->vertex_decl.offsets[VertexAttribute::Position]);
+	norm = (float*)(p_vert + p_mesh_data->vertex_decl.offsets[VertexAttribute::Normal]);
+	tex_coord = (float*)(p_vert + p_mesh_data->vertex_decl.offsets[VertexAttribute::TexCoord0]);
+	pos[0] = half_w;
+	pos[1] = 0.0f;
+	pos[2] = half_l;
+	norm[0] = 0.0f;
+	norm[1] = 1.0f;
+	norm[2] = 0.0f;
+	tex_coord[0] = 0.0f;
+	tex_coord[1] = 1.0f;
+
+	// vertex 3
+	p_vert = p_mesh_data->ptr_vertices + 3 * p_mesh_data->vertex_decl.stride;
+	pos = (float*)(p_vert + p_mesh_data->vertex_decl.offsets[VertexAttribute::Position]);
+	norm = (float*)(p_vert + p_mesh_data->vertex_decl.offsets[VertexAttribute::Normal]);
+	tex_coord = (float*)(p_vert + p_mesh_data->vertex_decl.offsets[VertexAttribute::TexCoord0]);
+	pos[0] = -half_w;
+	pos[1] = 0.0f;
+	pos[2] = half_l;
+	norm[0] = 0.0f;
+	norm[1] = 1.0f;
+	norm[2] = 0.0f;
+	tex_coord[0] = 0.0f;
+	tex_coord[1] = 0.0f;
+
+	// index
+	uint16_t* indices = (uint16_t*)p_mesh_data->ptr_indices;
+	indices[0] = 0;
+	indices[1] = 1;
+	indices[2] = 2;
+	indices[3] = 0;
+	indices[4] = 2;
+	indices[5] = 3;
+
+	return p_mesh_data;
+}
 MeshData* GeometryMesh::GenerateTorus(float outer_radius, float inner_radius, int nsides, int nrings)
 {
 	// get number of face and vertex

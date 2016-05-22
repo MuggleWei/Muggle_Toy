@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
 	cmd_line.append("--RenderType OpenGL ");
 	cmd_line.append("--RenderVersion.major 4 ");
 	cmd_line.append("--RenderVersion.minor 4 ");
-	cmd_line.append("--project opengl_diffuse_per_vertex ");
+	cmd_line.append("--project opengl_phong ");
 	cmd_line.append("--vsync on ");
 	cmd_line.append("--lockfps off ");
 	cmd_line.append("--lockfps.value 33.333333");

@@ -9,7 +9,7 @@ uniform vec4 LightPositionInEye;	// light position in eye space
 uniform vec3 Kd;					// Diffuse reflectivity
 uniform vec3 Ld;					// Light intensity
 
-uniform mat4 ModleViewMatrix;
+uniform mat4 ModelViewMatrix;
 uniform mat3 NormalMatrix;
 uniform mat4 MVP;
 
@@ -17,7 +17,7 @@ void main()
 {
 	// Convert normal and position to eye space
 	vec3 norm = normalize(NormalMatrix * VertexNormal);
-	vec4 posInEye = ModleViewMatrix * vec4(VertexPosition, 1.0);
+	vec4 posInEye = ModelViewMatrix * vec4(VertexPosition, 1.0);
 	
 	// get light direction in eye space
 	vec3 s = normalize(vec3(LightPositionInEye - posInEye));

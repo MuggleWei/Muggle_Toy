@@ -61,6 +61,7 @@ struct MG_DLL MeshData
 class MG_DLL GeometryMesh
 {
 public:
+	static MeshData* GeneratePlane(float len, float width);
 	static MeshData* GenerateTorus(float outer_radius, float inner_radius, int nsides, int nrings);
 };
 

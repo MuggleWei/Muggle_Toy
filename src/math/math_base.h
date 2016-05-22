@@ -17,6 +17,12 @@ class Math
 public:
 
 	template<typename T>
+	static T DegreeToRad(const T& degree_val)
+	{
+		return degree_val * PI / (T)180;
+	}
+
+	template<typename T>
 	static bool Equal(const T& val1, const T& val2, T deviation = MIN_DEVIATION)
 	{
 		return Math::Abs(val1 - val2) <= deviation;

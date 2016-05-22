@@ -1,5 +1,5 @@
-#ifndef __OPENGL_DIFFUSE_PER_VERT_H__
-#define __OPENGL_DIFFUSE_PER_VERT_H__
+#ifndef __OPENGL_LAMBERT_H__
+#define __OPENGL_LAMBERT_H__
 
 #include "base/base.h"
 

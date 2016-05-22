@@ -1,4 +1,4 @@
-#include "diffuse_per_vert.h"
+#include "phong.h"
 #include "application/application.h"
 #include "render/renderer.h"
 #include "glad/glad.h"
@@ -79,15 +79,21 @@ void Render()
 
 	muggle::vec4f light_position_in_eye = mat_view.Multiply(muggle::vec4f(5.0f, 5.0f, -2.0f, 1.0f));
 
-	shader_program.setUniform("LightPositionInEye", light_position_in_eye);
-	shader_program.setUniform("Kd", muggle::vec3f(0.9f, 0.5f, 0.3f));
-	shader_program.setUniform("Ld", muggle::vec3f(1.0f, 1.0f, 1.0f));
-	
-	shader_program.setUniform("ModleViewMatrix", mat_mv);
+	// set uniform variable in shader
+	shader_program.setUniform("Light.Position", light_position_in_eye);
+	shader_program.setUniform("Light.La", 0.4f, 0.4f, 0.4f);
+	shader_program.setUniform("Light.Ld", 1.0f, 1.0f, 1.0f);
+	shader_program.setUniform("Light.Ls", 1.0f, 1.0f, 1.0f);
+	shader_program.setUniform("Material.Ka", 0.9f, 0.5f, 0.3f);
+	shader_program.setUniform("Material.Kd", 0.9f, 0.5f, 0.3f);
+	shader_program.setUniform("Material.Ks", 0.8f, 0.8f, 0.8f);
+	shader_program.setUniform("Material.Shininess", 100.0f);
+
+	shader_program.setUniform("ModelViewMatrix", mat_mv);
 	shader_program.setUniform("NormalMatrix", mat_normal);
 	shader_program.setUniform("MVP", mat_mvp);
 
-	glDrawElements(GL_TRIANGLES, p_mesh->num_index,  GL_UNSIGNED_SHORT, (GLvoid*)NULL);
+	glDrawElements(GL_TRIANGLES, p_mesh->num_index, GL_UNSIGNED_SHORT, (GLvoid*)NULL);
 }
 void Destroy()
 {
@@ -126,11 +132,11 @@ void PrepareShader()
 {
 	// create shader object
 	vert_shader = muggle::CreateShaderObj(
-		renderer, "res_learn_opengl/shaders/diffuse_per_vertex_vert.glsl", "main",
+		renderer, "res_learn_opengl/shaders/phong_vert.glsl", "main",
 		muggle::ShaderStageType::VS, muggle::ShaderType::GLSL
 	);
 	frag_shader = muggle::CreateShaderObj(
-		renderer, "res_learn_opengl/shaders/diffuse_per_vertex_frag.glsl", "main",
+		renderer, "res_learn_opengl/shaders/phong_frag.glsl", "main",
 		muggle::ShaderStageType::PS, muggle::ShaderType::GLSL
 	);
 
@@ -158,6 +164,10 @@ void CreateVBO()
 	size_t index_size = p_mesh->size_index * p_mesh->num_index;
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_handles[VBO_Index]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_size, (void*)p_mesh->ptr_indices, GL_STATIC_DRAW);
+
+	// end bind vbo
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 void CreateVAO()
 {
@@ -171,9 +181,9 @@ void CreateVAO()
 
 	// map attribute index to buffer
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_handles[VBO_Vertex]);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
 		p_mesh->vertex_decl.stride, (void*)p_mesh->vertex_decl.offsets[muggle::VertexAttribute::Position]);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
 		p_mesh->vertex_decl.stride, (void*)p_mesh->vertex_decl.offsets[muggle::VertexAttribute::Normal]);
 
 	// bind index

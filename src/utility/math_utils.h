@@ -82,10 +82,6 @@ public:
 		y_axis.Normalize();
 
 		Vector3<T> nag_eye = -eye;
-		if (GetMathUseGL())
-		{
-			z_axis = -z_axis;
-		}
 
 		Matrix4x4<T> mat4 = Matrix4x4<T>(
 			x_axis.x, y_axis.x, z_axis.x, (T)0,
@@ -126,17 +122,16 @@ public:
 
 		mat4.m[0][0] = (T)1 / (aspect * tan_half_fov);
 		mat4.m[1][1] = (T)1 / tan_half_fov;
+		mat4.m[2][3] = (T)1;
 
 		if (GetMathUseGL())
 		{
-			mat4.m[2][2] = -(zFar + zNear) / (zFar - zNear);
-			mat4.m[2][3] = (T)-1;
+			mat4.m[2][2] = (zFar + zNear) / (zFar - zNear);
 			mat4.m[3][2] = (T)(-2) * zFar * zNear / (zFar - zNear);
 		}
 		else
 		{
 			mat4.m[2][2] = zFar / (zFar - zNear);
-			mat4.m[2][3] = (T)1;
 			mat4.m[3][2] = -zFar * zNear / (zFar - zNear);
 		}	
 
