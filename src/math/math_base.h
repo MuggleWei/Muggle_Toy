@@ -7,9 +7,9 @@
 NS_MUGGLE_BEGIN
 
 #undef  PI
-#define PI 					(3.1415926535897932f)
-#define INV_PI				(0.31830988618f)
-#define HALF_PI				(1.57079632679f)
+#define PI 					(3.141593)
+#define INV_PI				(0.31830988618)
+#define HALF_PI				(1.57079632679)
 #define MIN_DEVIATION		(FLT_EPSILON)
 
 class Math
@@ -19,7 +19,7 @@ public:
 	template<typename T>
 	static T DegreeToRad(const T& degree_val)
 	{
-		return degree_val * PI / (T)180;
+		return degree_val * (T)PI / (T)180;
 	}
 
 	template<typename T>
@@ -70,7 +70,8 @@ public:
 	template<typename T>
 	static T Tan(const T& val)
 	{
-		return tanf(val);
+		return tan(val);
+		// return tanf(val);
 	}
 	template<typename T>
 	static T ATan(const T& val)

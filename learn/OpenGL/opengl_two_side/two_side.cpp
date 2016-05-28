@@ -57,7 +57,7 @@ void Update()
 {
 	camera.Update();
 
-	muggle::quatf quat = muggle::quatf::FromYawPitchRoll(0.0f, -HALF_PI, 0.0f);
+	muggle::quatf quat = muggle::quatf::FromYawPitchRoll(0.0f, (float)-HALF_PI, 0.0f);
 	mat_model = muggle::MathUtils::Rotate(quat);
 	mat_view = camera.getViewMatrix();
 	mat_projection = camera.getProjectionMatrix();

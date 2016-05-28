@@ -51,7 +51,7 @@ public:
 	float m_rotate_x_axis;
 
 	// about perspective
-	float m_fov;	// angle degree
+	float m_fov;					// degree
 	float m_aspect;
 	float m_z_near;
 	float m_z_far;

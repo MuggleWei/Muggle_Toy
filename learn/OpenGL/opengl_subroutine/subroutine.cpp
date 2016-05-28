@@ -1,4 +1,4 @@
-#include "phong.h"
+#include "subroutine.h"
 #include "application/application.h"
 #include "render/renderer.h"
 #include "glad/glad.h"
@@ -130,11 +130,8 @@ void PrepareData()
 }
 void PrepareShader()
 {
-	const char* vert_shader_name = "res_learn_opengl/shaders/phong_vert.glsl";
-	const char* frag_shader_name = "res_learn_opengl/shaders/phong_frag.glsl";
-//	const char* vert_shader_name = "res_learn_opengl/shaders/phong_flat_vert.glsl";
-//	const char* frag_shader_name = "res_learn_opengl/shaders/phong_flat_frag.glsl";
-//	glProvokingVertex(GL_FIRST_VERTEX_CONVENTION);
+	const char* vert_shader_name = "res_learn_opengl/shaders/subroutine_vert.glsl";
+	const char* frag_shader_name = "res_learn_opengl/shaders/subroutine_frag.glsl";
 
 	// create shader object
 	vert_shader = muggle::CreateShaderObj(
@@ -185,7 +182,7 @@ void CreateVAO()
 	glEnableVertexAttribArray(0);		// vertex position
 	glEnableVertexAttribArray(1);		// vertex normal
 
-	// map attribute index to buffer
+										// map attribute index to buffer
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_handles[VBO_Vertex]);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
 		p_mesh->vertex_decl.stride, (void*)p_mesh->vertex_decl.offsets[muggle::VertexAttribute::Position]);

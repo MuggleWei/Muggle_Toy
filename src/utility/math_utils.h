@@ -118,7 +118,7 @@ public:
 	{
 		Matrix4x4<T> mat4 = Matrix4x4<T>::zero;
 
-		T tan_half_fov = Math::Tan(fov * (T)0.5);
+		T tan_half_fov = Math::Tan(fov / (T)2);
 
 		mat4.m[0][0] = (T)1 / (aspect * tan_half_fov);
 		mat4.m[1][1] = (T)1 / tan_half_fov;

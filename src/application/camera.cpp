@@ -17,7 +17,7 @@ Camera::Camera()
 	, m_target_position(vec3f::zero)
 	, m_rotate_y_axis(0.0f)
 	, m_rotate_x_axis(0.0f)
-	, m_fov(45.0f)
+	, m_fov(60.0f)
 	, m_aspect(1.333f)
 	, m_z_near(0.1f)
 	, m_z_far(1000.0f)
@@ -234,36 +234,25 @@ void Camera::RotateAroundTarget(float delta_x_pos, float delta_y_pos)
 }
 void Camera::Drag(double delta_x_pos, double delta_y_pos)
 {
-	// compute the ratio between window screen and z-near plane			
+	// get window width and height
 	int width, height;
 	Window* win = GetApplication()->getWindow();
 	if (win)
 	{
 		win->getWinSize(width, height);
 	}
+	
+	// get drag plane distance
+	muggle::vec3f target = m_target_position - m_position;
+	float drag_plane_distance = muggle::vec3f::Dot(target, m_direction);
 
-	/*
-	float z_near_plane_width, z_near_plane_height;
-	z_near_plane_height = tan(m_fov / 2) * m_z_near * 2;
-	z_near_plane_width = z_near_plane_height * m_aspect;
+	// calculate camera move
+	float H = 2 * muggle::Math::Tan(muggle::Math::DegreeToRad(m_fov / 2)) * drag_plane_distance;
+	muggle::vec3f delta_x = m_right * H * m_aspect * (float)delta_x_pos / (float)width;
+	muggle::vec3f delta_y = m_up * H * (float)delta_y_pos / (float)height;
 
-	float ratio_width_screen_znear = z_near_plane_width / width;
-	float ratio_heigh_screen_znear = z_near_plane_height / height;
-
-	// compute move position
-	m_position -= m_right * m_drag_plane_distance * (float)delta_x_pos * ratio_width_screen_znear / m_z_near;
-	m_position -= m_up * m_drag_plane_distance * (float)delta_y_pos * ratio_heigh_screen_znear / m_z_near;
-	*/
-
-	// optimize: Simplify the compute above
-	float drag_plane_distance = (m_target_position - m_position).Length();
-	float factor = 2 * tan(m_fov / 2) * drag_plane_distance;
-	muggle::vec3f delta_x = m_right * factor * m_aspect * (float)delta_x_pos / (float)width;
-	muggle::vec3f delta_y = m_up * factor * (float)delta_y_pos / (float)height;
 	m_position -= delta_x;
 	m_position -= delta_y;
-//	m_target_position -= delta_x;
-//	m_target_position -= delta_y;
 }
 
 NS_MUGGLE_END
