@@ -157,6 +157,21 @@ float Camera::getFarPlane()
 	return m_z_far;
 }
 
+void Camera::setPosition(vec3f pos)
+{
+	m_position = pos;
+	m_dirty = true;
+}
+
+void Camera::setMoveSpeed(float speed)
+{
+	m_move_speed = speed;
+}
+float Camera::getMoveSpeed()
+{
+	return m_move_speed;
+}
+
 void Camera::UpdateMatrix()
 {
 	m_dirty = false;

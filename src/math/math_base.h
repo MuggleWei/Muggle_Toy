@@ -44,34 +44,33 @@ public:
 	template<typename T>
 	static T Sqrt(const T& val)
 	{
-		return sqrtf(val);
+		return sqrt(val);
 	}
 
 	template<typename T>
 	static T Sin(const T& val)
 	{
-		return sinf(val);
+		return sin(val);
 	}
 	template<typename T>
 	static T ASin(const T& val)
 	{
-		return asinf(Clamp(val, (T)-1, (T)1));
+		return asin(Clamp(val, (T)-1, (T)1));
 	}
 	template<typename T>
 	static T Cos(const T& val)
 	{
-		return cosf(val);
+		return cos(val);
 	}
 	template<typename T>
 	static T ACos(const T& val)
 	{
-		return acosf(Clamp(val, (T)-1, (T)1));
+		return acos(Clamp(val, (T)-1, (T)1));
 	}
 	template<typename T>
 	static T Tan(const T& val)
 	{
 		return tan(val);
-		// return tanf(val);
 	}
 	template<typename T>
 	static T ATan(const T& val)
@@ -81,7 +80,7 @@ public:
 	template<typename T>
 	static T ATan2(const T& y, const T& x)
 	{
-		return atan2f(y, x);
+		return atan2(y, x);
 	}
 };
 

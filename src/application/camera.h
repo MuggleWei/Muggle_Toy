@@ -28,6 +28,11 @@ public:
 	MG_DLL float getNearPlane();
 	MG_DLL float getFarPlane();
 
+	MG_DLL void setPosition(vec3f pos);
+
+	MG_DLL void setMoveSpeed(float speed);
+	MG_DLL float getMoveSpeed();
+
 protected:
 	void UpdateMatrix();
 
@@ -35,7 +40,7 @@ protected:
 	void RotateAroundTarget(float delta_x_pos, float delta_y_pos);
 	void Drag(double delta_x_pos, double delta_y_pos);
 
-public:
+protected:
 	matrix4f m_view_matrix;
 	matrix4f m_projection_matrix;
 

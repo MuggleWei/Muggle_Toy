@@ -180,16 +180,16 @@ public:
 	static void Update();
 	static bool Initialize();
 
-	static bool GetKey(eKeyCode key_code);
-	static bool GetKeyDown(eKeyCode key_code);
-	static bool GetKeyUp(eKeyCode key_code);
+	MG_DLL static bool GetKey(eKeyCode key_code);
+	MG_DLL static bool GetKeyDown(eKeyCode key_code);
+	MG_DLL static bool GetKeyUp(eKeyCode key_code);
 
-	static bool GetMouse(eMouseButton button);
-	static bool GetMouseDown(eMouseButton button);
-	static bool GetMouseUp(eMouseButton button);
+	MG_DLL static bool GetMouse(eMouseButton button);
+	MG_DLL static bool GetMouseDown(eMouseButton button);
+	MG_DLL static bool GetMouseUp(eMouseButton button);
 
-	static vec2i GetMousePos();
-	static int16_t GetMouseWheel();
+	MG_DLL static vec2i GetMousePos();
+	MG_DLL static int16_t GetMouseWheel();
 
 public:
 	static void KeyDown(eKeyCode key_code);

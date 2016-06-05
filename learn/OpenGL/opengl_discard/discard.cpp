@@ -1,4 +1,4 @@
-#include "two_side.h"
+#include "discard.h"
 #include "application/application.h"
 #include "render/renderer.h"
 #include "glad/glad.h"
@@ -57,8 +57,7 @@ void Update()
 {
 	camera.Update();
 
-	muggle::quatf quat = muggle::quatf::FromYawPitchRoll(0.0f, (float)-HALF_PI, 0.0f);
-	mat_model = muggle::MathUtils::Rotate(quat);
+	mat_model = muggle::matrix4f::identify;
 	mat_view = camera.getViewMatrix();
 	mat_projection = camera.getProjectionMatrix();
 
@@ -93,7 +92,6 @@ void Render()
 	shader_program.setUniform("ModelViewMatrix", mat_mv);
 	shader_program.setUniform("NormalMatrix", mat_normal);
 	shader_program.setUniform("MVP", mat_mvp);
-
 	int index_type = (p_mesh->size_index == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT);
 	glDrawElements(GL_TRIANGLES, p_mesh->num_index, index_type, (GLvoid*)NULL);
 }
@@ -125,20 +123,23 @@ void Destroy()
 
 void PrepareData()
 {
-	p_mesh = muggle::GeometryMesh::GeneratePlane(2, 2);
+	p_mesh = muggle::GeometryMesh::GenerateSphere(1.0f, 30, 30);
 
 	CreateVBO();
 	CreateVAO();
 }
 void PrepareShader()
 {
+	const char* vert_shader_name = "res_learn_opengl/shaders/discard_vert.glsl";
+	const char* frag_shader_name = "res_learn_opengl/shaders/discard_frag.glsl";
+
 	// create shader object
 	vert_shader = muggle::CreateShaderObj(
-		renderer, "res_learn_opengl/shaders/two_side_vert.glsl", "main",
+		renderer, vert_shader_name, "main",
 		muggle::ShaderStageType::VS, muggle::ShaderType::GLSL
 	);
 	frag_shader = muggle::CreateShaderObj(
-		renderer, "res_learn_opengl/shaders/two_side_frag.glsl", "main",
+		renderer, frag_shader_name, "main",
 		muggle::ShaderStageType::PS, muggle::ShaderType::GLSL
 	);
 
@@ -180,6 +181,7 @@ void CreateVAO()
 	// enable vertex attribute arrays
 	glEnableVertexAttribArray(0);		// vertex position
 	glEnableVertexAttribArray(1);		// vertex normal
+	glEnableVertexAttribArray(2);		// vertex uv
 
 	// map attribute index to buffer
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_handles[VBO_Vertex]);
@@ -187,6 +189,8 @@ void CreateVAO()
 		p_mesh->vertex_decl.stride, (void*)p_mesh->vertex_decl.offsets[muggle::VertexAttribute::Position]);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
 		p_mesh->vertex_decl.stride, (void*)p_mesh->vertex_decl.offsets[muggle::VertexAttribute::Normal]);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE,
+		p_mesh->vertex_decl.stride, (void*)p_mesh->vertex_decl.offsets[muggle::VertexAttribute::TexCoord0]);
 
 	// bind index
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_handles[VBO_Index]);

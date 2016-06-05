@@ -56,8 +56,8 @@ public:
 	{
 		return Matrix4x4<T>(
 			v.x, (T)0, (T)0, (T)0,
-			(T)0, v.y, (T)0, (T)0
-			(T)0, (T)0, v.z, (T)0
+			(T)0, v.y, (T)0, (T)0,
+			(T)0, (T)0, v.z, (T)0,
 			(T)0, (T)0, (T)0, (T)1
 			);
 	}

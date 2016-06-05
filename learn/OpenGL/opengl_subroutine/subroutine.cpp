@@ -32,6 +32,11 @@ static muggle::matrix4f mat_projection;
 static muggle::matrix4f mat_mv;
 static muggle::matrix3f mat_normal;
 static muggle::matrix4f mat_mvp;
+static muggle::matrix4f mat_mv2;
+static muggle::matrix3f mat_normal2;
+static muggle::matrix4f mat_mvp2;
+static GLuint lambertModelIndex = 0;
+static GLuint phongModelIndex = 0;
 
 void Init()
 {
@@ -57,7 +62,7 @@ void Update()
 {
 	camera.Update();
 
-	mat_model = muggle::matrix4f::identify;
+	mat_model = muggle::MathUtils::Translate(muggle::vec3f::right * -2.0f);
 	mat_view = camera.getViewMatrix();
 	mat_projection = camera.getProjectionMatrix();
 
@@ -66,6 +71,13 @@ void Update()
 	mat_normal = muggle::matrix3f::Inverse(mat_normal);
 	mat_normal = muggle::matrix3f::Transpose(mat_normal);
 	mat_mvp = mat_mv * mat_projection;
+
+	mat_model = muggle::MathUtils::Translate(muggle::vec3f::right * 2.0f);
+	mat_mv2 = mat_model * mat_view;
+	mat_normal2 = (muggle::matrix3f)mat_mv2;
+	mat_normal2 = muggle::matrix3f::Inverse(mat_normal2);
+	mat_normal2 = muggle::matrix3f::Transpose(mat_normal2);
+	mat_mvp2 = mat_mv2 * mat_projection;
 }
 void Render()
 {
@@ -93,7 +105,16 @@ void Render()
 	shader_program.setUniform("NormalMatrix", mat_normal);
 	shader_program.setUniform("MVP", mat_mvp);
 
-	glDrawElements(GL_TRIANGLES, p_mesh->num_index, GL_UNSIGNED_SHORT, (GLvoid*)NULL);
+	int index_type = (p_mesh->size_index == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT);
+
+	glUniformSubroutinesuiv(GL_VERTEX_SHADER, 1, &lambertModelIndex);
+	glDrawElements(GL_TRIANGLES, p_mesh->num_index, index_type, (GLvoid*)NULL);
+
+	shader_program.setUniform("ModelViewMatrix", mat_mv2);
+	shader_program.setUniform("NormalMatrix", mat_normal2);
+	shader_program.setUniform("MVP", mat_mvp2);
+	glUniformSubroutinesuiv(GL_VERTEX_SHADER, 1, &phongModelIndex);
+	glDrawElements(GL_TRIANGLES, p_mesh->num_index, index_type, (GLvoid*)NULL);
 }
 void Destroy()
 {
@@ -123,7 +144,7 @@ void Destroy()
 
 void PrepareData()
 {
-	p_mesh = muggle::GeometryMesh::GenerateTorus(1.0, 0.3f, 30, 30);
+	p_mesh = muggle::GeometryMesh::GenerateSphere(1.0f, 30, 30);
 
 	CreateVBO();
 	CreateVAO();
@@ -150,6 +171,10 @@ void PrepareShader()
 
 	// link shader program
 	shader_program.Link();
+
+	// get subroutine index
+	lambertModelIndex = glGetSubroutineIndex(shader_program.getHandle(), GL_VERTEX_SHADER, "lambertModel");
+	phongModelIndex = glGetSubroutineIndex(shader_program.getHandle(), GL_VERTEX_SHADER, "phongModel");
 }
 
 void CreateVBO()

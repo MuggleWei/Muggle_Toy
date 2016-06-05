@@ -130,6 +130,34 @@ function(sample_code name folder_name)
 	)
 endfunction(sample_code) 
 
+# function for keep files consistent
+function(consistent_files fake_proj_name source_dir target_dir target_name)	
+	if (WIN32)
+		set(custom_consistent_res_command "${CMAKE_SOURCE_DIR}/consistent_res.bat")
+	else()
+		set(custom_consistent_res_command "${CMAKE_SOURCE_DIR}/consistent_res.sh")
+	endif()
+
+	# keep resources consistent
+	if (WIN32)
+		add_custom_target(${fake_proj_name} ALL
+			COMMAND ${custom_consistent_res_command} ${source_dir} ${target_dir}/${target_name}
+			COMMAND ${custom_consistent_res_command} ${source_dir} ${target_dir}/Debug/${target_name}
+			COMMAND ${custom_consistent_res_command} ${source_dir} ${target_dir}/Release/${target_name}
+		)
+	else()
+		add_custom_target(${fake_proj_name} ALL
+			COMMAND ${custom_consistent_res_command} ${source_dir} ${target_dir}/${target_name}
+		)
+	endif()
+	
+	set_target_properties(
+		${fake_proj_name}
+		PROPERTIES
+		FOLDER "FAKE"
+	)
+endfunction(consistent_files) 
+
 # add sample and learn code
 if (${MUGGLE_TOY_BUILD_SAMPLE})
 	add_subdirectory(sample)

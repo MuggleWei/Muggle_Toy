@@ -1,12 +1,12 @@
 #version 400
 
-subroutine vec3 shadeModelType(vec4 position, vec3 normal);
-subroutine uniform shadeModelType shadeModel;
-
 layout (location = 0) in vec3 VertexPosition;
 layout (location = 1) in vec3 VertexNormal;
+layout (location = 2) in vec2 VertexTexCoord;
 
-out vec3 LightIntensity;
+out vec3 FrontColor;
+out vec3 BackColor;
+out vec2 TexCoord;
 
 struct LightInfo
 {
@@ -36,12 +36,12 @@ void getEyeSpace(out vec4 position, out vec3 norm)
 	norm = normalize(NormalMatrix * VertexNormal);
 }
 
-subroutine( shadeModelType )
-vec3 phongModel( vec4 position, vec3 norm )
+vec3 PhongModel(vec4 position, vec3 norm)
 {
 	vec3 s = normalize(vec3(Light.Position - position));	// light dir
 	vec3 v = normalize(-position.xyz);						// view dir
 	vec3 r = reflect(-s, norm);								// reflect dir
+	r = normalize(r);
 	
 	// ambient
 	vec3 ambient = Light.La * Material.Ka;
@@ -60,23 +60,20 @@ vec3 phongModel( vec4 position, vec3 norm )
 	return ambient + diffuse + spec;
 }
 
-subroutine( shadeModelType )
-vec3 lambertModel( vec4 position, vec3 norm )
-{
-	vec3 s = normalize(vec3(Light.Position - position));
-	return Light.Ld * Material.Kd * max(dot(s, norm), 0.0);
-}
-
 void main()
 {
 	vec3 eyeNormal;
 	vec4 eyePosition;
 	
+	// coord
+	TexCoord = VertexTexCoord;
+	
 	// get position and normal in eye space
 	getEyeSpace(eyePosition, eyeNormal);
 	
-	// illumination model
-	LightIntensity = shadeModel( eyePosition, eyeNormal );
+	// phong illumination model
+	FrontColor = PhongModel(eyePosition, eyeNormal);
+	BackColor = PhongModel(eyePosition, -eyeNormal);
 	
 	// position
 	gl_Position = MVP * vec4(VertexPosition, 1.0);

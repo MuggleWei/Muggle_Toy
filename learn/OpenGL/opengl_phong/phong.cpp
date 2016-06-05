@@ -93,7 +93,8 @@ void Render()
 	shader_program.setUniform("NormalMatrix", mat_normal);
 	shader_program.setUniform("MVP", mat_mvp);
 
-	glDrawElements(GL_TRIANGLES, p_mesh->num_index, GL_UNSIGNED_SHORT, (GLvoid*)NULL);
+	int index_type = (p_mesh->size_index == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT);
+	glDrawElements(GL_TRIANGLES, p_mesh->num_index, index_type, (GLvoid*)NULL);
 }
 void Destroy()
 {

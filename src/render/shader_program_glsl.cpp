@@ -922,6 +922,19 @@ bool ShaderProgramGLSL::RetrieveUniformBlockInfo()
 
 	return true;
 }
+bool ShaderProgramGLSL::RetrieveSubroutineInfo()
+{
+	// I don't know how to retrieve all subroutine name and correspond shader type
+	/*
+	GLint n_nums, max_len;
+	glGetProgramiv(m_handle, GL_ACTIVE_SUBROUTINE_UNIFORMS, &n_nums);
+	glGetProgramiv(m_handle, GL_ACTIVE_SUBROUTINE_UNIFORM_MAX_LENGTH, &max_len);
+	GLchar* name = (GLchar*)malloc(max_len + 1);
 
+	free(name);
+	*/
+
+	return true;
+}
 
 NS_MUGGLE_END

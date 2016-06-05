@@ -1,5 +1,6 @@
 #include "application.h"
 #include "base/dll.h"
+#include "base/str_utils.h"
 #include "utility/string_utils.h"
 #include "utility/timer.h"
 #include "utility/scope_time.h"
@@ -61,10 +62,7 @@ bool Application::ParseCmdLine(const char* cmd_line)
 	std::vector<char*> args;
 	while (1)
 	{
-		while (*p == ' ' || *p == '\t')
-		{
-			++p;
-		}
+		MG_SKIP_BLANK(p);
 
 		if (*p == '\0')
 		{

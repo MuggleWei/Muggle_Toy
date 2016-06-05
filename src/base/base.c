@@ -5,7 +5,7 @@
 #include <unistd.h>
 #endif
 
-MG_DLL void ExportWarning(const char* cond, const char* file_name, int line, const char* format, ...)
+void ExportWarning(const char* cond, const char* file_name, int line, const char* format, ...)
 {
 	va_list args;
 	va_start(args, format);

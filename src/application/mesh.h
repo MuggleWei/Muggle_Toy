@@ -29,7 +29,8 @@ ENUM_STRUCT(VertexAttribute, FOREACH_ENUM_VERTEX_ATTRIBUTE)
 	_(Int8) \
 	_(Int16) \
 	_(Int32) \
-	_(Float)
+	_(Float) \
+	_(Double)
 ENUM_STRUCT(VertexAttributeType, FOREACH_ENUM_VERTEX_ATTRIBUTE_TYPE)
 
 // vertex declare
@@ -37,6 +38,7 @@ struct MG_DLL VertexDeclare
 {
 	void Init();
 	void Add(VertexAttribute::Enum attri, uint8_t num, VertexAttributeType::Enum attri_type);
+	bool Exist(VertexAttribute::Enum attri);
 
 	uint16_t stride;
 	int16_t offsets[VertexAttribute::Max];
@@ -54,7 +56,17 @@ struct MG_DLL MeshData
 	intptr_t ptr_vertices;
 	intptr_t ptr_indices;
 	VertexDeclare vertex_decl;	
-	int16_t size_index;			// size of per index data, int16 or int32
+	int16_t size_index;			// size of per index data, u_int16 or u_int32
+};
+
+// mesh
+class MG_DLL Mesh
+{
+public:
+	static void GenerateNormal(MeshData *p_mesh_data);
+	static MeshData* Load(const char* file_name);
+
+	static MeshData* LoadPly(const char* file_name);
 };
 
 // geometry mesh object
@@ -62,6 +74,7 @@ class MG_DLL GeometryMesh
 {
 public:
 	static MeshData* GeneratePlane(float len, float width);
+	static MeshData* GenerateSphere(float radius, unsigned int rings, unsigned int segments);
 	static MeshData* GenerateTorus(float outer_radius, float inner_radius, int nsides, int nrings);
 };
 

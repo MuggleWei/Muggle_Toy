@@ -136,10 +136,11 @@ do \
 #define MG_MAX_PATH 1024
 #endif
 
-// sprintf_s
+// sprintf_s, _strdup
 #if MG_PLATFORM_WINDOWS
 #else
 #define sprintf_s(buf, size_in_byte, format, ...) sprintf(buf, format, ##__VA_ARGS__)
+#define _strdup strdup
 #endif
 
 // enum and enum string

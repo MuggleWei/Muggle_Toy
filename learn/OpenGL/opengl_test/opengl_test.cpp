@@ -1,4 +1,4 @@
-#include "two_side.h"
+#include "opengl_test.h"
 #include "application/application.h"
 #include "render/renderer.h"
 #include "glad/glad.h"
@@ -10,6 +10,7 @@
 #include "utility/math_utils.h"
 #include "application/camera.h"
 #include "mesh.h"
+#include "application/input.h"
 
 enum
 {
@@ -31,7 +32,13 @@ static muggle::matrix4f mat_view;
 static muggle::matrix4f mat_projection;
 static muggle::matrix4f mat_mv;
 static muggle::matrix3f mat_normal;
+static muggle::matrix3f mat_world_normal;
 static muggle::matrix4f mat_mvp;
+static GLuint lambertModelIndex = 0;
+static GLuint phongModelIndex = 0;
+static GLuint normalColorIndex = 0;
+static GLuint absoluteNormalColorIndex = 0;
+static GLuint shadeModelIndex = 0;
 
 void Init()
 {
@@ -50,6 +57,9 @@ void Init()
 	PrepareShader();
 	PrepareData();
 
+	camera.setMoveSpeed(0.1f);
+	camera.setPosition(muggle::vec3f(0.0f, 0.0f, -5.0f));
+
 	// camera initialize
 	camera.Update();
 }
@@ -57,8 +67,8 @@ void Update()
 {
 	camera.Update();
 
-	muggle::quatf quat = muggle::quatf::FromYawPitchRoll(0.0f, (float)-HALF_PI, 0.0f);
-	mat_model = muggle::MathUtils::Rotate(quat);
+	// mat_model = muggle::matrix4f::identify;
+	mat_model = muggle::MathUtils::Scale(muggle::vec3f(10.0f, 10.0f, 10.0f));
 	mat_view = camera.getViewMatrix();
 	mat_projection = camera.getProjectionMatrix();
 
@@ -67,6 +77,31 @@ void Update()
 	mat_normal = muggle::matrix3f::Inverse(mat_normal);
 	mat_normal = muggle::matrix3f::Transpose(mat_normal);
 	mat_mvp = mat_mv * mat_projection;
+
+	mat_world_normal = (muggle::matrix3f)mat_model;
+	mat_world_normal = muggle::matrix3f::Inverse(mat_world_normal);
+	mat_world_normal = muggle::matrix3f::Transpose(mat_world_normal);
+
+	if (muggle::Input::GetKeyDown(muggle::eKeyCode::Number1) ||
+		muggle::Input::GetKeyDown(muggle::eKeyCode::Key1))
+	{
+		shadeModelIndex = lambertModelIndex;
+	}
+	if (muggle::Input::GetKeyDown(muggle::eKeyCode::Number2) ||
+		muggle::Input::GetKeyDown(muggle::eKeyCode::Key2))
+	{
+		shadeModelIndex = phongModelIndex;
+	}
+	if (muggle::Input::GetKeyDown(muggle::eKeyCode::Number3) ||
+		muggle::Input::GetKeyDown(muggle::eKeyCode::Key3))
+	{
+		shadeModelIndex = normalColorIndex;
+	}
+	if (muggle::Input::GetKeyDown(muggle::eKeyCode::Number4) ||
+		muggle::Input::GetKeyDown(muggle::eKeyCode::Key4))
+	{
+		shadeModelIndex = absoluteNormalColorIndex;
+	}
 }
 void Render()
 {
@@ -78,7 +113,7 @@ void Render()
 
 	glBindVertexArray(vao_handle);
 
-	muggle::vec4f light_position_in_eye = mat_view.Multiply(muggle::vec4f(5.0f, 5.0f, -2.0f, 1.0f));
+	muggle::vec4f light_position_in_eye = mat_view.Multiply(muggle::vec4f(-5.0f, 5.0f, -2.0f, 1.0f));
 
 	// set uniform variable in shader
 	shader_program.setUniform("Light.Position", light_position_in_eye);
@@ -93,9 +128,12 @@ void Render()
 	shader_program.setUniform("ModelViewMatrix", mat_mv);
 	shader_program.setUniform("NormalMatrix", mat_normal);
 	shader_program.setUniform("MVP", mat_mvp);
+	shader_program.setUniform("WorldNormalMatrix", mat_world_normal);
 
+	glUniformSubroutinesuiv(GL_VERTEX_SHADER, 1, &shadeModelIndex);
 	int index_type = (p_mesh->size_index == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT);
 	glDrawElements(GL_TRIANGLES, p_mesh->num_index, index_type, (GLvoid*)NULL);
+	
 }
 void Destroy()
 {
@@ -125,20 +163,25 @@ void Destroy()
 
 void PrepareData()
 {
-	p_mesh = muggle::GeometryMesh::GeneratePlane(2, 2);
+	p_mesh = muggle::Mesh::Load("res/Stanford 3D Scanning/bunny/reconstruction/bun_zipper.ply");
+	// p_mesh = muggle::Mesh::Load("res/Stanford 3D Scanning/dragon_recon/dragon_vrip.ply");
+	// p_mesh = muggle::Mesh::Load("res/Stanford 3D Scanning/happy_recon/happy_vrip.ply");
 
 	CreateVBO();
 	CreateVAO();
 }
 void PrepareShader()
 {
+	const char* vert_shader_name = "res_learn_opengl/shaders/gl_test_vert.glsl";
+	const char* frag_shader_name = "res_learn_opengl/shaders/gl_test_frag.glsl";
+
 	// create shader object
 	vert_shader = muggle::CreateShaderObj(
-		renderer, "res_learn_opengl/shaders/two_side_vert.glsl", "main",
+		renderer, vert_shader_name, "main",
 		muggle::ShaderStageType::VS, muggle::ShaderType::GLSL
 	);
 	frag_shader = muggle::CreateShaderObj(
-		renderer, "res_learn_opengl/shaders/two_side_frag.glsl", "main",
+		renderer, frag_shader_name, "main",
 		muggle::ShaderStageType::PS, muggle::ShaderType::GLSL
 	);
 
@@ -149,6 +192,13 @@ void PrepareShader()
 
 	// link shader program
 	shader_program.Link();
+
+	// get subroutine index
+	lambertModelIndex = glGetSubroutineIndex(shader_program.getHandle(), GL_VERTEX_SHADER, "lambertModel");
+	phongModelIndex = glGetSubroutineIndex(shader_program.getHandle(), GL_VERTEX_SHADER, "phongModel");
+	normalColorIndex = glGetSubroutineIndex(shader_program.getHandle(), GL_VERTEX_SHADER, "NormalColor");
+	absoluteNormalColorIndex = glGetSubroutineIndex(shader_program.getHandle(), GL_VERTEX_SHADER, "AbsoluteNormalColor");
+	shadeModelIndex = phongModelIndex;
 }
 
 void CreateVBO()
@@ -180,6 +230,7 @@ void CreateVAO()
 	// enable vertex attribute arrays
 	glEnableVertexAttribArray(0);		// vertex position
 	glEnableVertexAttribArray(1);		// vertex normal
+	glEnableVertexAttribArray(2);		// vertex uv
 
 	// map attribute index to buffer
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_handles[VBO_Vertex]);
@@ -187,6 +238,8 @@ void CreateVAO()
 		p_mesh->vertex_decl.stride, (void*)p_mesh->vertex_decl.offsets[muggle::VertexAttribute::Position]);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
 		p_mesh->vertex_decl.stride, (void*)p_mesh->vertex_decl.offsets[muggle::VertexAttribute::Normal]);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE,
+		p_mesh->vertex_decl.stride, (void*)p_mesh->vertex_decl.offsets[muggle::VertexAttribute::TexCoord0]);
 
 	// bind index
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_handles[VBO_Index]);
