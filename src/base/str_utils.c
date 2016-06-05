@@ -69,7 +69,8 @@ char* StrUtils_SplitLineToWords(char* line, char** words, int* word_idx, int max
 	*word_idx = 0;
 
 	q = line;
-	r = line;
+	MG_SKIP_BLANK(q);
+	r = q;
 	while (*q != '\n' && *q != '\r' && *q != '\0')
 	{
 		if (word_idx == max_word_num)
@@ -97,11 +98,14 @@ char* StrUtils_SplitLineToWords(char* line, char** words, int* word_idx, int max
 		MWARNING(0, "It's has no enough space to split line to words");
 		return q;
 	}
-	if (*q == '\n' || *q == '\r')
+	if (*r != '\r' && *r != '\n' && *r != '\0')
+	{
+		words[(*word_idx)++] = r;
+	}
+	while (*q == '\n' || *q == '\r')
 	{
 		*q = '\0';
 		++q;
-		words[(*word_idx)++] = r;
 		r = q;
 	}
 

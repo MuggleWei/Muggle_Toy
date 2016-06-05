@@ -193,16 +193,19 @@ MeshData* ConvertPlyToMeshData(PlyFile* ply_file)
 							if (strcmp(prop->name, "x") == 0)
 							{
 								float* pos = (float*)(p_vert + p_mesh_data->vertex_decl.offsets[VertexAttribute::Position]);
+								MASSERT(*(words[k]) != '\0');
 								pos[0] = atof(words[k]);
 							}
 							else if (strcmp(prop->name, "y") == 0)
 							{
 								float* pos = (float*)(p_vert + p_mesh_data->vertex_decl.offsets[VertexAttribute::Position]);
+								MASSERT(*(words[k]) != '\0');
 								pos[1] = atof(words[k]);
 							}
 							else if (strcmp(prop->name, "z") == 0)
 							{
 								float* pos = (float*)(p_vert + p_mesh_data->vertex_decl.offsets[VertexAttribute::Position]);
+								MASSERT(*(words[k]) != '\0');
 								pos[2] = atof(words[k]);
 							}
 						}						

@@ -65,8 +65,6 @@ char* PlyAddElement(PlyFile* ply_file, char* line)
 
 char* PlyAddProperty(PlyFile* ply_file, char* line)
 {
-	int prop_type;
-	int count_type;
 	PlyProperty *prop;
 	PlyElement *elem;
 	char* words[8];
@@ -211,7 +209,7 @@ char* PlyParseHeader(PlyFile* ply_file, char* p)
 				return NULL;
 			}
 				
-			ply_file->version = atof(words[2]);
+			ply_file->version = (float)atof(words[2]);
 		}
 		else if (strncmp(p, "property", strlen("property")) == 0)
 		{
