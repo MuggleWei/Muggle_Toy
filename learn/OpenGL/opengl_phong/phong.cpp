@@ -131,10 +131,10 @@ void PrepareData()
 }
 void PrepareShader()
 {
-	const char* vert_shader_name = "res_learn_opengl/shaders/phong_vert.glsl";
-	const char* frag_shader_name = "res_learn_opengl/shaders/phong_frag.glsl";
-//	const char* vert_shader_name = "res_learn_opengl/shaders/phong_flat_vert.glsl";
-//	const char* frag_shader_name = "res_learn_opengl/shaders/phong_flat_frag.glsl";
+	const char* vert_shader_name = "res_learn_opengl/shaders/Phong_Gouraud_vert.glsl";
+	const char* frag_shader_name = "res_learn_opengl/shaders/Phong_Gouraud_frag.glsl";
+//	const char* vert_shader_name = "res_learn_opengl/shaders/Phong_Flat_vert.glsl";
+//	const char* frag_shader_name = "res_learn_opengl/shaders/Phong_Flat_frag.glsl";
 //	glProvokingVertex(GL_FIRST_VERTEX_CONVENTION);
 
 	// create shader object

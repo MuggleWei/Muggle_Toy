@@ -1,3 +1,4 @@
+// vertex shader, Lambert Illumination models, Gouraud shading Interpolation
 #version 400
 
 layout (location = 0) in vec3 VertexPosition;

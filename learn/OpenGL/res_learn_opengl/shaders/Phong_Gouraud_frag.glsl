@@ -1,7 +1,7 @@
-// fragment shader, Phong Illumination models, Flat shading Interpolation
+// fragment shader, Phong Illumination models, Gouraud shading Interpolation
 #version 400
 
-flat in vec3 LightIntensity;
+in vec3 LightIntensity;
 
 layout( location = 0 ) out vec4 FragColor;
 

@@ -1,3 +1,4 @@
+// fragment shader, Lambert Illumination models, Gouraud shading Interpolation
 #version 400
 
 in vec3 LightIntensity;
