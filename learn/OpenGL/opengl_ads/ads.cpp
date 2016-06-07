@@ -1,4 +1,4 @@
-#include "phong.h"
+#include "ads.h"
 #include "application/application.h"
 #include "render/renderer.h"
 #include "glad/glad.h"
@@ -125,14 +125,19 @@ void Destroy()
 void PrepareData()
 {
 	p_mesh = muggle::GeometryMesh::GenerateTorus(1.0, 0.3f, 30, 30);
+	// p_mesh = muggle::Mesh::Load("res/Stanford 3D Scanning/bunny/reconstruction/bun_zipper.ply");
 
 	CreateVBO();
 	CreateVAO();
 }
 void PrepareShader()
 {
-	const char* vert_shader_name = "res_learn_opengl/shaders/Phong_Gouraud_vert.glsl";
-	const char* frag_shader_name = "res_learn_opengl/shaders/Phong_Gouraud_frag.glsl";
+	const char* vert_shader_name = "res_learn_opengl/shaders/BlinnPhong_Phong_vert.glsl";
+	const char* frag_shader_name = "res_learn_opengl/shaders/BlinnPhong_Phong_frag.glsl";
+//	const char* vert_shader_name = "res_learn_opengl/shaders/Phong_Phong_vert.glsl";
+//	const char* frag_shader_name = "res_learn_opengl/shaders/Phong_Phong_frag.glsl";
+//	const char* vert_shader_name = "res_learn_opengl/shaders/Phong_Gouraud_vert.glsl";
+//	const char* frag_shader_name = "res_learn_opengl/shaders/Phong_Gouraud_frag.glsl";
 //	const char* vert_shader_name = "res_learn_opengl/shaders/Phong_Flat_vert.glsl";
 //	const char* frag_shader_name = "res_learn_opengl/shaders/Phong_Flat_frag.glsl";
 //	glProvokingVertex(GL_FIRST_VERTEX_CONVENTION);

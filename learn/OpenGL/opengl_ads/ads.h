@@ -1,5 +1,5 @@
-#ifndef __OPENGL_PHONG_H__
-#define __OPENGL_PHONG_H__
+#ifndef __OPENGL_ADS_H__
+#define __OPENGL_ADS_H__
 
 #include "base/base.h"
 

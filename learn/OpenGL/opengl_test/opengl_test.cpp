@@ -19,6 +19,18 @@ enum
 	VBO_MAX
 };
 
+enum eGlTestShaderModel
+{
+	GTSM_Ambient = 0,
+	GTSM_Diffuse,
+	GTSM_PhongSpec,
+	GTSM_BlinnSPec,
+	GTSM_Phong,
+	GTSM_Blinn,
+	GTSM_Normal,
+	GTSM_Max,
+};
+
 static muggle::Renderer* renderer = nullptr;
 static muggle::ShaderObj *vert_shader = nullptr, *frag_shader = nullptr;
 static muggle::ShaderProgramGLSL shader_program;
@@ -34,11 +46,8 @@ static muggle::matrix4f mat_mv;
 static muggle::matrix3f mat_normal;
 static muggle::matrix3f mat_world_normal;
 static muggle::matrix4f mat_mvp;
-static GLuint lambertModelIndex = 0;
-static GLuint phongModelIndex = 0;
-static GLuint normalColorIndex = 0;
-static GLuint absoluteNormalColorIndex = 0;
-static GLuint shadeModelIndex = 0;
+static GLuint shade_model[GTSM_Max];
+static GLuint shade_model_index = 0;
 
 void Init()
 {
@@ -85,22 +94,37 @@ void Update()
 	if (muggle::Input::GetKeyDown(muggle::eKeyCode::Number1) ||
 		muggle::Input::GetKeyDown(muggle::eKeyCode::Key1))
 	{
-		shadeModelIndex = lambertModelIndex;
+		shade_model_index = shade_model[GTSM_Ambient];
 	}
 	if (muggle::Input::GetKeyDown(muggle::eKeyCode::Number2) ||
 		muggle::Input::GetKeyDown(muggle::eKeyCode::Key2))
 	{
-		shadeModelIndex = phongModelIndex;
+		shade_model_index = shade_model[GTSM_Diffuse];
 	}
 	if (muggle::Input::GetKeyDown(muggle::eKeyCode::Number3) ||
 		muggle::Input::GetKeyDown(muggle::eKeyCode::Key3))
 	{
-		shadeModelIndex = normalColorIndex;
+		shade_model_index = shade_model[GTSM_PhongSpec];
 	}
 	if (muggle::Input::GetKeyDown(muggle::eKeyCode::Number4) ||
 		muggle::Input::GetKeyDown(muggle::eKeyCode::Key4))
 	{
-		shadeModelIndex = absoluteNormalColorIndex;
+		shade_model_index = shade_model[GTSM_BlinnSPec];
+	}
+	if (muggle::Input::GetKeyDown(muggle::eKeyCode::Number5) ||
+		muggle::Input::GetKeyDown(muggle::eKeyCode::Key5))
+	{
+		shade_model_index = shade_model[GTSM_Phong];
+	}
+	if (muggle::Input::GetKeyDown(muggle::eKeyCode::Number6) ||
+		muggle::Input::GetKeyDown(muggle::eKeyCode::Key6))
+	{
+		shade_model_index = shade_model[GTSM_Blinn];
+	}
+	if (muggle::Input::GetKeyDown(muggle::eKeyCode::Number7) ||
+		muggle::Input::GetKeyDown(muggle::eKeyCode::Key7))
+	{
+		shade_model_index = shade_model[GTSM_Normal];
 	}
 }
 void Render()
@@ -130,7 +154,7 @@ void Render()
 	shader_program.setUniform("MVP", mat_mvp);
 	shader_program.setUniform("WorldNormalMatrix", mat_world_normal);
 
-	glUniformSubroutinesuiv(GL_VERTEX_SHADER, 1, &shadeModelIndex);
+	glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &shade_model_index);
 	int index_type = (p_mesh->size_index == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT);
 	glDrawElements(GL_TRIANGLES, p_mesh->num_index, index_type, (GLvoid*)NULL);
 	
@@ -172,6 +196,8 @@ void PrepareData()
 }
 void PrepareShader()
 {
+	// const char* vert_shader_name = "res_learn_opengl/shaders/Phong_Phong_vert.glsl";
+	// const char* frag_shader_name = "res_learn_opengl/shaders/Phong_Phong_frag.glsl";
 	const char* vert_shader_name = "res_learn_opengl/shaders/gl_test_vert.glsl";
 	const char* frag_shader_name = "res_learn_opengl/shaders/gl_test_frag.glsl";
 
@@ -194,11 +220,21 @@ void PrepareShader()
 	shader_program.Link();
 
 	// get subroutine index
-	lambertModelIndex = glGetSubroutineIndex(shader_program.getHandle(), GL_VERTEX_SHADER, "lambertModel");
-	phongModelIndex = glGetSubroutineIndex(shader_program.getHandle(), GL_VERTEX_SHADER, "phongModel");
-	normalColorIndex = glGetSubroutineIndex(shader_program.getHandle(), GL_VERTEX_SHADER, "NormalColor");
-	absoluteNormalColorIndex = glGetSubroutineIndex(shader_program.getHandle(), GL_VERTEX_SHADER, "AbsoluteNormalColor");
-	shadeModelIndex = phongModelIndex;
+	shade_model[GTSM_Ambient] = glGetSubroutineIndex(shader_program.getHandle(), GL_FRAGMENT_SHADER, "AmbientColor");
+	shade_model[GTSM_Diffuse] = glGetSubroutineIndex(shader_program.getHandle(), GL_FRAGMENT_SHADER, "DiffuseColor");
+	shade_model[GTSM_PhongSpec] = glGetSubroutineIndex(shader_program.getHandle(), GL_FRAGMENT_SHADER, "PhongSpecularColor");
+	shade_model[GTSM_BlinnSPec] = glGetSubroutineIndex(shader_program.getHandle(), GL_FRAGMENT_SHADER, "BlinnPhongSpecularColor");
+	shade_model[GTSM_Phong] = glGetSubroutineIndex(shader_program.getHandle(), GL_FRAGMENT_SHADER, "PhongModel");
+	shade_model[GTSM_Blinn] = glGetSubroutineIndex(shader_program.getHandle(), GL_FRAGMENT_SHADER, "BlinnPhongModel");
+	shade_model[GTSM_Normal] = glGetSubroutineIndex(shader_program.getHandle(), GL_FRAGMENT_SHADER, "NormalColor");
+	for (int i = 0; i < GTSM_Max; ++i)
+	{
+		if (GL_INVALID_INDEX == shade_model[i])
+		{
+			MASSERT(0);
+		}
+	}
+	shade_model_index = shade_model[GTSM_Normal];
 }
 
 void CreateVBO()
