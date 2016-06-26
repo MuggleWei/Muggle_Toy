@@ -17,6 +17,9 @@ MG_DLL bool File_GetAbsolutePath(const char* in_file_name, char* out_file_path);
 MG_DLL bool File_GetDirectory(const char* file_path, char* dir);
 MG_DLL bool File_Read(const char* file_path, char** ptr_bytes, long* ptr_num);
 
+MG_DLL void* File_GetHandle(const char* file_path, const char* mode);
+MG_DLL void File_CloseHandle(void* file_handle);
+
 EXTERN_C_END
 
 #endif

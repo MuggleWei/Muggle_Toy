@@ -9,6 +9,7 @@
 #include "math/quaternion.h"
 #include "utility/math_utils.h"
 #include "application/camera.h"
+#include "application/input.h"
 #include "mesh.h"
 
 enum
@@ -18,20 +19,38 @@ enum
 	VBO_MAX
 };
 
+enum eTestLightType
+{
+	TLT_Position = 0,
+	TLT_Direction,
+	TLT_Spot,
+	TLT_MAX,
+};
+
+enum eTestMeshObj
+{
+	TMO_Plane = 0,
+	TMO_Sphere,
+	TMO_Torus,
+	TMO_MAX,
+};
+
 static muggle::Renderer* renderer = nullptr;
 static muggle::ShaderObj *vert_shader = nullptr, *frag_shader = nullptr;
 static muggle::ShaderProgramGLSL shader_program;
-static GLuint vao_handle = 0;
-static GLuint vbo_handles[VBO_MAX] = { 0 };
+static GLuint vao_handles[TMO_MAX] = { 0 };
+static GLuint vbo_handles[TMO_MAX][VBO_MAX] = { 0 };
 static float angle_radian = 0.0f;
 static muggle::Camera camera;
-static muggle::MeshData* p_mesh = nullptr;
-static muggle::matrix4f mat_model;
+static muggle::MeshData* p_mesh[TMO_MAX] = { nullptr };
+static muggle::matrix4f mat_model[TMO_MAX];
 static muggle::matrix4f mat_view;
 static muggle::matrix4f mat_projection;
 static muggle::matrix4f mat_mv;
 static muggle::matrix3f mat_normal;
 static muggle::matrix4f mat_mvp;
+static GLuint shade_model[TLT_MAX];
+static GLuint shade_model_index = 0;
 
 void Init()
 {
@@ -57,15 +76,28 @@ void Update()
 {
 	camera.Update();
 
-	mat_model = muggle::MathUtils::Rotate(muggle::quatf::FromYawPitchRoll(0.0f, (float)-HALF_PI, 0.0f));
 	mat_view = camera.getViewMatrix();
 	mat_projection = camera.getProjectionMatrix();
 
-	mat_mv = mat_model * mat_view;
-	mat_normal = (muggle::matrix3f)mat_mv;
-	mat_normal = muggle::matrix3f::Inverse(mat_normal);
-	mat_normal = muggle::matrix3f::Transpose(mat_normal);
-	mat_mvp = mat_mv * mat_projection;
+	mat_model[TMO_Plane] = muggle::MathUtils::Rotate(muggle::quatf::FromYawPitchRoll(0.0f, (float)-HALF_PI, 0.0f));
+	mat_model[TMO_Sphere] = muggle::MathUtils::Translate(muggle::vec3f(3.0f, 0.0f, -4.0f));
+	mat_model[TMO_Torus] = muggle::MathUtils::Translate(muggle::vec3f(-3.0f, 0.0f, -4.0f));
+
+	if (muggle::Input::GetKeyDown(muggle::eKeyCode::Number1) ||
+		muggle::Input::GetKeyDown(muggle::eKeyCode::Key1))
+	{
+		shade_model_index = shade_model[TLT_Position];
+	}
+	if (muggle::Input::GetKeyDown(muggle::eKeyCode::Number2) ||
+		muggle::Input::GetKeyDown(muggle::eKeyCode::Key2))
+	{
+		shade_model_index = shade_model[TLT_Direction];
+	}
+	if (muggle::Input::GetKeyDown(muggle::eKeyCode::Number3) ||
+		muggle::Input::GetKeyDown(muggle::eKeyCode::Key3))
+	{
+		shade_model_index = shade_model[TLT_Spot];
+	}
 }
 void Render()
 {
@@ -75,33 +107,66 @@ void Render()
 
 	shader_program.Use();
 
-	glBindVertexArray(vao_handle);
-
-	muggle::vec4f light_position_in_eye = mat_view.Multiply(muggle::vec4f(0.0f, 0.0f, -2.0f, 0.0f));
-
 	// set uniform variable in shader
-	shader_program.setUniform("PositionLight.Position", light_position_in_eye);
-	shader_program.setUniform("PositionLight.Intensity", muggle::vec3f(0.7f, 0.7f, 0.7f));
+	if (shade_model_index == shade_model[TLT_Position])
+	{
+		muggle::vec4f light_position_in_eye = mat_view.Multiply(muggle::vec4f(5.0f, 5.0f, -5.0f, 1.0f));
+		shader_program.setUniform("PositionLight.Position", light_position_in_eye);
+		shader_program.setUniform("PositionLight.Intensity", muggle::vec3f(0.7f, 0.7f, 0.7f));
+	}
+	else if (shade_model_index == shade_model[TLT_Direction])
+	{
+		muggle::vec4f light_dir_in_eye = mat_view.Multiply(muggle::vec4f(-5.0f, -5.0f, 5.0f, 0.0f));
+		shader_program.setUniform("DirectionLight.Direction", light_dir_in_eye);
+		shader_program.setUniform("DirectionLight.Intensity", muggle::vec3f(0.7f, 0.7f, 0.7f));
+	}
+	else if (shade_model_index == shade_model[TLT_Spot])
+	{
+		muggle::vec4f light_position_in_eye = mat_view.Multiply(muggle::vec4f(5.0f, 5.0f, -8.0f, 1.0f));
+		muggle::vec4f light_dir_in_eye = mat_view.Multiply(muggle::vec4f(-1.0f, -1.0f, 1.0f, 0.0f));
+		light_dir_in_eye.Normalize();
+		shader_program.setUniform("SpotLight.Position", light_position_in_eye);
+		shader_program.setUniform("SpotLight.Intensity", muggle::vec3f(0.7f, 0.7f, 0.7f));
+		shader_program.setUniform("SpotLight.Direction", muggle::vec3f(light_dir_in_eye));
+		shader_program.setUniform("SpotLight.Exponent", 30.0f);
+		shader_program.setUniform("SpotLight.Cutoff", 45.0f);
+	}
 	shader_program.setUniform("Material.Ka", 0.9f, 0.5f, 0.3f);
 	shader_program.setUniform("Material.Kd", 0.9f, 0.5f, 0.3f);
-	shader_program.setUniform("Material.Ks", 0.8f, 0.8f, 0.8f);
+	shader_program.setUniform("Material.Ks", 0.2f, 0.2f, 0.2f);
 	shader_program.setUniform("Material.Shininess", 100.0f);
 
-	shader_program.setUniform("ModelViewMatrix", mat_mv);
-	shader_program.setUniform("NormalMatrix", mat_normal);
-	shader_program.setUniform("MVP", mat_mvp);
+	for (size_t i = 0; i < TMO_MAX; ++i)
+	{
+		glBindVertexArray(vao_handles[i]);
 
-	int index_type = (p_mesh->size_index == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT);
-	glDrawElements(GL_TRIANGLES, p_mesh->num_index, index_type, (GLvoid*)NULL);
+		mat_mv = mat_model[i] * mat_view;
+		mat_normal = (muggle::matrix3f)mat_mv;
+		mat_normal = muggle::matrix3f::Inverse(mat_normal);
+		mat_normal = muggle::matrix3f::Transpose(mat_normal);
+		mat_mvp = mat_mv * mat_projection;
+
+		shader_program.setUniform("ModelViewMatrix", mat_mv);
+		shader_program.setUniform("NormalMatrix", mat_normal);
+		shader_program.setUniform("MVP", mat_mvp);
+
+		glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &shade_model_index);
+		int index_type = (p_mesh[i]->size_index == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT);
+		glDrawElements(GL_TRIANGLES, p_mesh[i]->num_index, index_type, (GLvoid*)NULL);
+	}
 }
 void Destroy()
 {
-	// delete vbo and vao
-	glDeleteBuffers(VBO_MAX, vbo_handles);
-	glDeleteVertexArrays(1, &vao_handle);
-
 	// delete data
-	delete p_mesh;
+	for (int i = 0; i < TMO_MAX; ++i)
+	{
+		// delete vbo and vao
+		glDeleteBuffers(VBO_MAX, vbo_handles[i]);
+		glDeleteVertexArrays(1, &vao_handles[i]);
+
+		delete p_mesh[i];
+	}
+
 
 	// destroy shader program and shader object
 	shader_program.Destroy();
@@ -122,7 +187,9 @@ void Destroy()
 
 void PrepareData()
 {
-	p_mesh = muggle::GeometryMesh::GeneratePlane(5.0f, 5.0f);
+	p_mesh[TMO_Plane] = muggle::GeometryMesh::GeneratePlane(20.0f, 20.0f);
+	p_mesh[TMO_Sphere] = muggle::GeometryMesh::GenerateSphere(2.0f, 30, 30);
+	p_mesh[TMO_Torus] = muggle::GeometryMesh::GenerateTorus(2.0f, 1.0f, 30, 30);
 
 	CreateVBO();
 	CreateVAO();
@@ -149,48 +216,66 @@ void PrepareShader()
 
 	// link shader program
 	shader_program.Link();
+
+	// get subroutine index
+	shade_model[TLT_Position] = glGetSubroutineIndex(shader_program.getHandle(), GL_FRAGMENT_SHADER, "PositionLightBlinnPhongModel");
+	shade_model[TLT_Direction] = glGetSubroutineIndex(shader_program.getHandle(), GL_FRAGMENT_SHADER, "DirectionLightBlinnPhongModel");
+	shade_model[TLT_Spot] = glGetSubroutineIndex(shader_program.getHandle(), GL_FRAGMENT_SHADER, "SpotLightBlinnPhongModel");
+	for (int i = 0; i < TLT_MAX; ++i)
+	{
+		if (GL_INVALID_INDEX == shade_model[i])
+		{
+			MASSERT(0);
+		}
+	}
 }
 
 void CreateVBO()
 {
-	// create buffer object
-	glGenBuffers(VBO_MAX, vbo_handles);
-	MASSERT_MSG(vbo_handles[VBO_Vertex] != 0 && vbo_handles[VBO_Index] != 0, "Failed in Generate buffer object");
+	for (size_t i = 0; i < TMO_MAX; ++i)
+	{
+		// create buffer object
+		glGenBuffers(VBO_MAX, vbo_handles[i]);
+		MASSERT_MSG(vbo_handles[i][VBO_Vertex] != 0 && vbo_handles[i][VBO_Index] != 0, "Failed in Generate buffer object");
 
-	// vertex buffer
-	size_t vert_size = p_mesh->num_vertex * p_mesh->vertex_decl.stride;
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_handles[VBO_Vertex]);
-	glBufferData(GL_ARRAY_BUFFER, vert_size, (void*)p_mesh->ptr_vertices, GL_STATIC_DRAW);
+		// vertex buffer
+		size_t vert_size = p_mesh[i]->num_vertex * p_mesh[i]->vertex_decl.stride;
+		glBindBuffer(GL_ARRAY_BUFFER, vbo_handles[i][VBO_Vertex]);
+		glBufferData(GL_ARRAY_BUFFER, vert_size, (void*)p_mesh[i]->ptr_vertices, GL_STATIC_DRAW);
 
-	// index buffer
-	size_t index_size = p_mesh->size_index * p_mesh->num_index;
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_handles[VBO_Index]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_size, (void*)p_mesh->ptr_indices, GL_STATIC_DRAW);
+		// index buffer
+		size_t index_size = p_mesh[i]->size_index * p_mesh[i]->num_index;
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_handles[i][VBO_Index]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_size, (void*)p_mesh[i]->ptr_indices, GL_STATIC_DRAW);
 
-	// end bind vbo
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		// end bind vbo
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
 }
 void CreateVAO()
 {
-	// create and bind to a vertex array object
-	glGenVertexArrays(1, &vao_handle);
-	glBindVertexArray(vao_handle);
+	for (size_t i = 0; i < TMO_MAX; ++i)
+	{
+		// create and bind to a vertex array object
+		glGenVertexArrays(1, &vao_handles[i]);
+		glBindVertexArray(vao_handles[i]);
 
-	// enable vertex attribute arrays
-	glEnableVertexAttribArray(0);		// vertex position
-	glEnableVertexAttribArray(1);		// vertex normal
+		// enable vertex attribute arrays
+		glEnableVertexAttribArray(0);		// vertex position
+		glEnableVertexAttribArray(1);		// vertex normal
 
-										// map attribute index to buffer
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_handles[VBO_Vertex]);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-		p_mesh->vertex_decl.stride, (void*)p_mesh->vertex_decl.offsets[muggle::VertexAttribute::Position]);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
-		p_mesh->vertex_decl.stride, (void*)p_mesh->vertex_decl.offsets[muggle::VertexAttribute::Normal]);
+											// map attribute index to buffer
+		glBindBuffer(GL_ARRAY_BUFFER, vbo_handles[i][VBO_Vertex]);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+			p_mesh[i]->vertex_decl.stride, (void*)p_mesh[i]->vertex_decl.offsets[muggle::VertexAttribute::Position]);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
+			p_mesh[i]->vertex_decl.stride, (void*)p_mesh[i]->vertex_decl.offsets[muggle::VertexAttribute::Normal]);
 
-	// bind index
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_handles[VBO_Index]);
+		// bind index
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_handles[i][VBO_Index]);
 
-	// end bind vao
-	glBindVertexArray(0);
+		// end bind vao
+		glBindVertexArray(0);
+	}
 }

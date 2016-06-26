@@ -9,6 +9,7 @@
 #include "math/vector4.h"
 #include "math/matrix4x4.h"
 #include "render/render_info.h"
+#include "texture.h"
 
 NS_MUGGLE_BEGIN
 
@@ -72,6 +73,7 @@ public:
 	MG_DLL void setUniform(const char* name, int val);
 	MG_DLL void setUniform(const char* name, bool val);	
 
+	MG_DLL void setTexture(const char* name, Texture* tex, int tex_unit);
 
 protected:
 	bool RetrieveInfo();

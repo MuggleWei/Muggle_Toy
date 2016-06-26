@@ -431,7 +431,7 @@ MeshData* GeometryMesh::GeneratePlane(float len, float width)
 	norm[0] = 0.0f;
 	norm[1] = 1.0f;
 	norm[2] = 0.0f;
-	tex_coord[0] = 1.0f;
+	tex_coord[0] = 0.0f;
 	tex_coord[1] = 0.0f;
 
 	// vertex 1
@@ -446,7 +446,7 @@ MeshData* GeometryMesh::GeneratePlane(float len, float width)
 	norm[1] = 1.0f;
 	norm[2] = 0.0f;
 	tex_coord[0] = 1.0f;
-	tex_coord[1] = 1.0f;
+	tex_coord[1] = 0.0f;
 
 	// vertex 2
 	p_vert = p_mesh_data->ptr_vertices + 2 * p_mesh_data->vertex_decl.stride;
@@ -459,7 +459,7 @@ MeshData* GeometryMesh::GeneratePlane(float len, float width)
 	norm[0] = 0.0f;
 	norm[1] = 1.0f;
 	norm[2] = 0.0f;
-	tex_coord[0] = 0.0f;
+	tex_coord[0] = 1.0f;
 	tex_coord[1] = 1.0f;
 
 	// vertex 3
@@ -474,7 +474,7 @@ MeshData* GeometryMesh::GeneratePlane(float len, float width)
 	norm[1] = 1.0f;
 	norm[2] = 0.0f;
 	tex_coord[0] = 0.0f;
-	tex_coord[1] = 0.0f;
+	tex_coord[1] = 1.0f;
 
 	// index
 	uint16_t* indices = (uint16_t*)p_mesh_data->ptr_indices;

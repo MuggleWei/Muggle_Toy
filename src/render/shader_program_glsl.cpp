@@ -776,6 +776,22 @@ void ShaderProgramGLSL::setUniform(const char* name, bool val)
 	}
 }
 
+void ShaderProgramGLSL::setTexture(const char* name, Texture* tex, int tex_unit)
+{
+	int sampler = getUniformLocation(name);
+
+	if (sampler >= 0)
+	{
+		glActiveTexture(GL_TEXTURE0 + tex_unit);
+		glBindTexture(GL_TEXTURE_2D, tex->getHandle());
+		glUniform1i(sampler, tex_unit);
+	}
+	else
+	{
+		MWARNING(0, "%s's uniform location is invalid\n", name);
+	}
+}
+
 bool ShaderProgramGLSL::RetrieveInfo()
 {
 	if (m_handle == 0)

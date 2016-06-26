@@ -39,22 +39,31 @@ endif()
 option(MUGGLE_TOY_BUILD_SAMPLE "Build sample code" ON)
 option(MUGGLE_TOY_BUILD_LEARN "Build learn code" ON)
 
-# add muggle toy libs
-add_subdirectory(src)
-
 # set muggle toy path and dll name
 set(MUGGLE_TOY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(muggle_base base)
 set(muggle_math math)
+set(muggle_image image)
 set(muggle_utility utility)
 set(muggle_render render)
 set(muggle_application application)
+
+set(muggle_base_lib muggle_base)
+set(muggle_math_lib muggle_math)
+set(muggle_utility_lib muggle_utility)
+set(muggle_image_lib muggle_image)
+set(muggle_render_lib muggle_render)
+set(muggle_application_lib muggle_application)
+
+# add muggle toy libs
+add_subdirectory(src)
 
 set(sample_include_dir
 	${MUGGLE_TOY_PATH}
 	${MUGGLE_TOY_PATH}/${muggle_base}
 	${MUGGLE_TOY_PATH}/${muggle_math}
 	${MUGGLE_TOY_PATH}/${muggle_utility}
+	${MUGGLE_TOY_PATH}/${muggle_image}
 	${MUGGLE_TOY_PATH}/${muggle_render}
 	${MUGGLE_TOY_PATH}/${muggle_application}
 	${MUGGLE_TOY_PATH}/dependencies
@@ -63,13 +72,14 @@ set(sample_include_dir
 
 # all muggle toy lib
 set(muggle_all_exclude_app
-	${muggle_base}
-	${muggle_utility}
-	${muggle_render}
+	${muggle_base_lib}
+	${muggle_utility_lib}
+	${muggle_image_lib}
+	${muggle_render_lib}
 )
 set(muggle_all
 	${muggle_all_exclude_app}
-	${muggle_application}
+	${muggle_application_lib}
 )
 
 # function for add sample code
@@ -128,6 +138,9 @@ function(sample_code name folder_name)
 		PROPERTIES
 		FOLDER "${folder_name}/${name}"
 	)
+	
+	add_dependencies(${name}_Entry ${name})
+	add_dependencies(${name} ${muggle_all})
 endfunction(sample_code) 
 
 # function for keep files consistent

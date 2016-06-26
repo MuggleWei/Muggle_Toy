@@ -44,6 +44,7 @@ include_directories(
 	.
 	base
 	utility
+	image
 	render
 	application
 	dependencies
@@ -52,25 +53,55 @@ include_directories(
 
 # include dependencies 
 set(glad_lib glad)
+
+# lib png and zlib output name
+if(UNIX)
+	set(zlib_name z)
+elseif(WIN32)
+	if (zlibUseShared)
+		set(zlib_name zlib)
+	else()
+		set(zlib_name zlibstatic)
+	endif()
+endif()
+if (UNIX)
+	set(libpng_name png)
+else()
+	if (lpngUseShared)
+		set(libpng_name libpng)
+	else()
+		set(libpng_name libpng_static)		
+	endif()	
+endif()
+
+# lib png and zlib target name
+set(libpng png)
+set(zlib zlib)
+
 add_subdirectory(dependencies)
 
 # all subdirectory
-set(muggle_base_lib base)
 message("## Add muggle base lib")
-add_subdirectory(${muggle_base_lib})
-set(muggle_utility_lib utility)
+add_subdirectory(${muggle_base})
 message("## Add muggle utility lib")
-add_subdirectory(${muggle_utility_lib})
-set(muggle_render_lib render)
+add_subdirectory(${muggle_utility})
+message("## Add muggle image lib")
+add_subdirectory(${muggle_image})
 message("## Add muggle render lib")
-add_subdirectory(${muggle_render_lib})
-set(muggle_application_lib application)
+add_subdirectory(${muggle_render})
 message("## Add muggle application lib")
-add_subdirectory(${muggle_application_lib})
+add_subdirectory(${muggle_application})
+
+# dependencies
+add_dependencies(${muggle_utility_lib} ${muggle_base_lib})
+add_dependencies(${muggle_image_lib} ${muggle_utility_lib})
+add_dependencies(${muggle_render_lib} ${muggle_image_lib})
+add_dependencies(${muggle_application_lib} ${muggle_render_lib} ${muggle_utility_lib} ${muggle_image_lib} ${muggle_base_lib})
 
 set_target_properties(
 	${muggle_base_lib}
 	${muggle_utility_lib}
+	${muggle_image_lib}
 	${muggle_render_lib}
 	${muggle_application_lib}
 	PROPERTIES

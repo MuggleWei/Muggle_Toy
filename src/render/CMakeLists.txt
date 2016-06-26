@@ -29,4 +29,5 @@ target_link_libraries(${muggle_render_lib}
 	${muggle_base_lib}
 	${muggle_utility_lib}
 	${glad_lib}
+	${muggle_image_lib}
 )

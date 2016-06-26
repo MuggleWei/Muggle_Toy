@@ -148,3 +148,13 @@ bool File_Read(const char* file_path, char** ptr_bytes, long* ptr_num)
 
 	return true;
 }
+
+void* File_GetHandle(const char* file_path, const char* mode)
+{
+	return (void*)fopen(file_path, mode);
+}
+void File_CloseHandle(void* file_handle)
+{
+	MASSERT_MSG(file_handle, "Try to close empty file handle");
+	fclose(file_handle);
+}
