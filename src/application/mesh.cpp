@@ -20,11 +20,13 @@ void VertexDeclare::Init()
 		offsets[i] = -1;
 	}
 	memset(attri_types, 0, sizeof(attri_types));
+	memset(attri_num, 0, sizeof(attri_num));
 }
 void VertexDeclare::Add(VertexAttribute::Enum attri, uint8_t num, VertexAttributeType::Enum attri_type)
 {
 	offsets[attri] = stride;
 	attri_types[attri] = attri_type;
+	attri_num[attri] = num;
 	stride += num * s_attri_type_size[attri_type];
 }
 bool VertexDeclare::Exist(VertexAttribute::Enum attri)
@@ -397,6 +399,8 @@ MeshData* GeometryMesh::GeneratePlane(float len, float width)
 	MeshData *p_mesh_data = new MeshData();
 	p_mesh_data->vertex_decl.Add(VertexAttribute::Position, 3, VertexAttributeType::Float);
 	p_mesh_data->vertex_decl.Add(VertexAttribute::Normal, 3, VertexAttributeType::Float);
+	p_mesh_data->vertex_decl.Add(VertexAttribute::Tangent, 3, VertexAttributeType::Float);
+	p_mesh_data->vertex_decl.Add(VertexAttribute::Bitangent, 3, VertexAttributeType::Float);
 	p_mesh_data->vertex_decl.Add(VertexAttribute::TexCoord0, 2, VertexAttributeType::Float);
 
 	p_mesh_data->num_vertex = 4;
@@ -417,7 +421,7 @@ MeshData* GeometryMesh::GeneratePlane(float len, float width)
 	 *  (-w, -l) 0 - 1 (w, -l)
 	 *
 	 */
-	float *pos, *norm, *tex_coord;
+	float *pos, *norm, *tex_coord, *tangent, *binormal;
 	intptr_t p_vert;
 
 	// vertex 0
@@ -485,6 +489,9 @@ MeshData* GeometryMesh::GeneratePlane(float len, float width)
 	indices[4] = 2;
 	indices[5] = 3;
 
+	// generate tangent and bitangent
+	ComputeTangentAndBitangent(p_mesh_data);
+
 	return p_mesh_data;
 }
 MeshData* GeometryMesh::GenerateSphere(float radius, unsigned int rings, unsigned int segments)
@@ -493,6 +500,8 @@ MeshData* GeometryMesh::GenerateSphere(float radius, unsigned int rings, unsigne
 	MeshData *p_mesh_data = new MeshData();
 	p_mesh_data->vertex_decl.Add(VertexAttribute::Position, 3, VertexAttributeType::Float);
 	p_mesh_data->vertex_decl.Add(VertexAttribute::Normal, 3, VertexAttributeType::Float);
+	p_mesh_data->vertex_decl.Add(VertexAttribute::Tangent, 3, VertexAttributeType::Float);
+	p_mesh_data->vertex_decl.Add(VertexAttribute::Bitangent, 3, VertexAttributeType::Float);
 	p_mesh_data->vertex_decl.Add(VertexAttribute::TexCoord0, 2, VertexAttributeType::Float);
 
 	p_mesh_data->num_vertex = rings * segments;
@@ -558,6 +567,9 @@ MeshData* GeometryMesh::GenerateSphere(float radius, unsigned int rings, unsigne
 		}
 	}
 	
+	// generate tangent and bitangent
+	ComputeTangentAndBitangent(p_mesh_data);
+
 	return p_mesh_data;
 }
 MeshData* GeometryMesh::GenerateTorus(float outer_radius, float inner_radius, int nsides, int nrings)
@@ -570,6 +582,8 @@ MeshData* GeometryMesh::GenerateTorus(float outer_radius, float inner_radius, in
 	MeshData *p_mesh_data = new MeshData();
 	p_mesh_data->vertex_decl.Add(VertexAttribute::Position, 3, VertexAttributeType::Float);
 	p_mesh_data->vertex_decl.Add(VertexAttribute::Normal, 3, VertexAttributeType::Float);
+	p_mesh_data->vertex_decl.Add(VertexAttribute::Tangent, 3, VertexAttributeType::Float);
+	p_mesh_data->vertex_decl.Add(VertexAttribute::Bitangent, 3, VertexAttributeType::Float);
 	p_mesh_data->vertex_decl.Add(VertexAttribute::TexCoord0, 2, VertexAttributeType::Float);
 
 	p_mesh_data->num_vertex = nVerts;
@@ -639,7 +653,194 @@ MeshData* GeometryMesh::GenerateTorus(float outer_radius, float inner_radius, in
 		}
 	}
 
+	// generate tangent and bitangent
+	ComputeTangentAndBitangent(p_mesh_data);
+
 	return p_mesh_data;
+}
+
+/*
+ *  compute a single triangle tangent and bitangent
+ *	note: this function need ensure mesh data contain position, texcoord0, tangent and bitangent space
+ *  note: in opengl, result of this function is right hand coordinate
+ */
+void ComputeTangentAndBitangent(MeshData* p_mesh_data, intptr_t p_vert0, intptr_t p_vert1, intptr_t p_vert2)
+{
+	MASSERT_MSG(
+		p_mesh_data->vertex_decl.Exist(VertexAttribute::Enum::Position) &&
+		p_mesh_data->vertex_decl.Exist(VertexAttribute::Enum::TexCoord0) &&
+		p_mesh_data->vertex_decl.Exist(VertexAttribute::Enum::Tangent) &&
+		p_mesh_data->vertex_decl.Exist(VertexAttribute::Enum::Bitangent),
+		"this function need ensure mesh data already allocate space for position, texcoord0, tangent and bitangent space"
+		);
+	MASSERT_MSG(
+		p_mesh_data->vertex_decl.attri_types[VertexAttribute::Enum::Position] == (uint8_t)VertexAttributeType::Enum::Float,
+		"Assume position is float type");
+	MASSERT_MSG(
+		p_mesh_data->vertex_decl.attri_types[VertexAttribute::Enum::TexCoord0] == (uint8_t)VertexAttributeType::Enum::Float,
+		"Assume texture coordinated is float type");
+
+	vec3f* p0 = (vec3f*)(p_vert0 + p_mesh_data->vertex_decl.offsets[VertexAttribute::Position]);
+	vec3f* p1 = (vec3f*)(p_vert1 + p_mesh_data->vertex_decl.offsets[VertexAttribute::Position]);
+	vec3f* p2 = (vec3f*)(p_vert2 + p_mesh_data->vertex_decl.offsets[VertexAttribute::Position]);
+
+	vec2f* uv0 = (vec2f*)(p_vert0 + p_mesh_data->vertex_decl.offsets[VertexAttribute::TexCoord0]);
+	vec2f* uv1 = (vec2f*)(p_vert1 + p_mesh_data->vertex_decl.offsets[VertexAttribute::TexCoord0]);
+	vec2f* uv2 = (vec2f*)(p_vert2 + p_mesh_data->vertex_decl.offsets[VertexAttribute::TexCoord0]);
+
+	vec3f delta_p1 = *p1 - *p0;
+	vec3f delta_p2 = *p2 - *p0;
+
+	vec2f delta_uv1 = *uv1 - *uv0;
+	vec2f delta_uv2 = *uv2 - *uv0;
+
+	float t = 1.0f / (delta_uv1.x * delta_uv2.y - delta_uv1.y * delta_uv2.x);
+	vec3f tangent = (delta_p1 * delta_uv2.y - delta_p2 * delta_uv1.y) * t;
+	vec3f bitangent = (delta_p2 * delta_uv1.x - delta_p1 * delta_uv2.x) * t;
+
+	tangent.Normalize();
+	bitangent.Normalize();
+
+	vec3f *t0 = (vec3f*)(p_vert0 + p_mesh_data->vertex_decl.offsets[VertexAttribute::Tangent]);
+	vec3f *t1 = (vec3f*)(p_vert1 + p_mesh_data->vertex_decl.offsets[VertexAttribute::Tangent]);
+	vec3f *t2 = (vec3f*)(p_vert2 + p_mesh_data->vertex_decl.offsets[VertexAttribute::Tangent]);
+
+	vec3f *b0 = (vec3f*)(p_vert0 + p_mesh_data->vertex_decl.offsets[VertexAttribute::Bitangent]);
+	vec3f *b1 = (vec3f*)(p_vert1 + p_mesh_data->vertex_decl.offsets[VertexAttribute::Bitangent]);
+	vec3f *b2 = (vec3f*)(p_vert2 + p_mesh_data->vertex_decl.offsets[VertexAttribute::Bitangent]);
+
+	*t0 = tangent;
+	*t1 = tangent;
+	*t2 = tangent;
+
+	*b0 = bitangent;
+	*b1 = bitangent;
+	*b2 = bitangent;
+}
+
+bool ComputeTangentAndBitangent(MeshData* p_mesh_data)
+{
+	if (!p_mesh_data->vertex_decl.Exist(VertexAttribute::Enum::Position) ||
+		!p_mesh_data->vertex_decl.Exist(VertexAttribute::Enum::TexCoord0) ||
+		!p_mesh_data->vertex_decl.Exist(VertexAttribute::Enum::Tangent) ||
+		!p_mesh_data->vertex_decl.Exist(VertexAttribute::Enum::Bitangent))
+	{
+		MWARNING(0, "This mesh can't compute tangent and bitangent!\n");
+		return false;
+	}
+
+	MASSERT_MSG(
+		p_mesh_data->vertex_decl.attri_types[VertexAttribute::Enum::Position] == (uint8_t)VertexAttributeType::Enum::Float,
+		"Assume position is float type");
+	MASSERT_MSG(
+		p_mesh_data->vertex_decl.attri_types[VertexAttribute::Enum::TexCoord0] == (uint8_t)VertexAttributeType::Enum::Float,
+		"Assume texture coordinated is float type");
+
+	if (p_mesh_data->num_index > 0)
+	{
+		MASSERT_MSG(p_mesh_data->size_index == 2 || p_mesh_data->size_index == 4,
+			"mesh data index size is wrong");
+
+		for (int i = 0; i < p_mesh_data->num_index / 3; ++i)
+		{
+			// get vertex index
+			uint32_t idx_p0, idx_p1, idx_p2;
+			if (p_mesh_data->size_index == 2)
+			{
+				uint16_t* p_index = (uint16_t*)(p_mesh_data->ptr_indices + i * 3 * sizeof(uint16_t));
+				idx_p0 = (uint32_t)p_index[0];
+				idx_p1 = (uint32_t)p_index[1];
+				idx_p2 = (uint32_t)p_index[2];
+			}
+			else if (p_mesh_data->size_index == 4)
+			{
+				uint32_t* p_index = (uint32_t*)(p_mesh_data->ptr_indices + i * 3 * sizeof(uint32_t));;
+				idx_p0 = p_index[0];
+				idx_p1 = p_index[1];
+				idx_p2 = p_index[2];
+			}
+
+			intptr_t p_vert0 = p_mesh_data->ptr_vertices + idx_p0 * p_mesh_data->vertex_decl.stride;
+			intptr_t p_vert1 = p_mesh_data->ptr_vertices + idx_p1 * p_mesh_data->vertex_decl.stride;
+			intptr_t p_vert2 = p_mesh_data->ptr_vertices + idx_p2 * p_mesh_data->vertex_decl.stride;
+
+			ComputeTangentAndBitangent(p_mesh_data, p_vert0, p_vert1, p_vert2);
+		}
+	}
+	else
+	{
+		if (p_mesh_data->num_vertex % 3 != 0)
+		{
+			MASSERT_MSG(0, "Only support tranigles");
+			return false;
+		}
+
+		for (int i = 0; i < p_mesh_data->num_vertex / 3; ++i)
+		{
+			MASSERT_MSG(i < p_mesh_data->num_vertex / 3, "i beyond the range");
+			intptr_t p_vert0 = p_mesh_data->ptr_vertices + i * p_mesh_data->vertex_decl.stride;
+			intptr_t p_vert1 = p_mesh_data->ptr_vertices + (i + 1) * p_mesh_data->vertex_decl.stride;
+			intptr_t p_vert2 = p_mesh_data->ptr_vertices + (i + 2) * p_mesh_data->vertex_decl.stride;
+
+			ComputeTangentAndBitangent(p_mesh_data, p_vert0, p_vert1, p_vert2);
+		}
+	}	
+
+	return true;
+}
+
+// this macro is for MeshDataPrint function
+#define PRINT_MESH_ATTRIBUTE(val_type) \
+val_type* val = (val_type*)ptr; \
+for (int j = 0; j < p_mesh_data->vertex_decl.attri_num[attri_idx]; ++j) \
+{ \
+	MLOG("%f  ", *(val + j)); \
+}
+
+void MeshDataPrint(MeshData* p_mesh_data)
+{
+#if MUGGLE_DEBUG
+	for (int i = 0; i < p_mesh_data->num_vertex; ++i)
+	{
+		intptr_t p_vert = p_mesh_data->ptr_vertices + i * p_mesh_data->vertex_decl.stride;
+		MLOG("vertex No.%d\n", i);
+
+		for (int attri_idx = 0; attri_idx < (int)VertexAttribute::Max; ++attri_idx)
+		{
+			if (p_mesh_data->vertex_decl.Exist((VertexAttribute::Enum)attri_idx))
+			{
+				intptr_t ptr = p_vert + p_mesh_data->vertex_decl.offsets[attri_idx];
+
+				const char* attri_name = VertexAttribute::EnumToString((VertexAttribute::Enum)attri_idx);
+				MLOG("%s: ", attri_name);
+				switch (p_mesh_data->vertex_decl.attri_types[attri_idx])
+				{
+				case (int)VertexAttributeType::Float:
+				{
+					PRINT_MESH_ATTRIBUTE(float)
+				}break;
+				case (int)VertexAttributeType::Double:
+				{
+					PRINT_MESH_ATTRIBUTE(double)
+				}break;
+				case (int)VertexAttributeType::Int8:
+				{
+					PRINT_MESH_ATTRIBUTE(int8_t)
+				}break;
+				case (int)VertexAttributeType::Int16:
+				{
+					PRINT_MESH_ATTRIBUTE(int16_t)
+				}break;
+				case (int)VertexAttributeType::Int32:
+				{
+					PRINT_MESH_ATTRIBUTE(int32_t)
+				}break;
+				}
+				MLOG("\n");
+			}
+		}
+	}
+#endif
 }
 
 NS_MUGGLE_END

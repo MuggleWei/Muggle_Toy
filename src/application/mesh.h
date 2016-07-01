@@ -10,7 +10,7 @@ NS_MUGGLE_BEGIN
 	_(Position) \
 	_(Normal) \
 	_(Tangent) \
-	_(bitangent) \
+	_(Bitangent) \
 	_(Weight) \
 	_(Color0) \
 	_(Color1) \
@@ -43,6 +43,7 @@ struct MG_DLL VertexDeclare
 	uint16_t stride;
 	int16_t offsets[VertexAttribute::Max];
 	uint8_t attri_types[VertexAttribute::Max];
+	uint8_t attri_num[VertexAttribute::Max];
 };
 
 // mesh data
@@ -77,6 +78,9 @@ public:
 	static MeshData* GenerateSphere(float radius, unsigned int rings, unsigned int segments);
 	static MeshData* GenerateTorus(float outer_radius, float inner_radius, int nsides, int nrings);
 };
+
+MG_DLL bool ComputeTangentAndBitangent(MeshData* p_mesh_data);
+MG_DLL void MeshDataPrint(MeshData* p_mesh_data);
 
 NS_MUGGLE_END
 
