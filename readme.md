@@ -10,6 +10,6 @@ Ensure CMake and Python is installed, I use python to sync resource file when co
 For now, this repo only support build in windows.
 
 Windows
-    $ md build && cd build
-    $ cmake .. -G "Visual Studio 14 2015 Win64"   # Or whatever generator you want to use cmake --help for a list.
-    $ start Muggle.sln
+ - md build && cd build
+ - cmake .. -G "Visual Studio 14 2015 Win64"   # Or whatever generator you want to use cmake --help for a list.
+ - start Muggle.sln

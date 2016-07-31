@@ -122,8 +122,16 @@ void Render()
 		shader_program.setUniform("MVP", mat_mvp);
 
 		glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &fog_index);
-		int index_type = (p_mesh->size_index == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT);
-		glDrawElements(GL_TRIANGLES, p_mesh->num_index, index_type, (GLvoid*)NULL);
+		
+		if (p_mesh->num_index > 0)
+		{
+			int index_type = (p_mesh->size_index == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT);
+			glDrawElements(GL_TRIANGLES, p_mesh->num_index, index_type, (GLvoid*)NULL);
+		}
+		else
+		{
+			glDrawArrays(GL_TRIANGLES, 0, p_mesh->num_vertex);
+		}
 	}	
 }
 void Destroy()

@@ -783,7 +783,15 @@ void ShaderProgramGLSL::setTexture(const char* name, Texture* tex, int tex_unit)
 	if (sampler >= 0)
 	{
 		glActiveTexture(GL_TEXTURE0 + tex_unit);
-		glBindTexture(GL_TEXTURE_2D, tex->getHandle());
+		if (tex->getType() == muggle::TextureType::Enum::Single)
+		{
+			
+			glBindTexture(GL_TEXTURE_2D, tex->getHandle());
+		}
+		else
+		{
+			glBindTexture(GL_TEXTURE_CUBE_MAP, tex->getHandle());
+		}
 		glUniform1i(sampler, tex_unit);
 	}
 	else

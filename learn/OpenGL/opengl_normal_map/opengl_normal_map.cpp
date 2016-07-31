@@ -105,7 +105,7 @@ void Render()
 
 	glBindVertexArray(vao_handle);
 
-	muggle::vec4f light_position_in_eye = mat_view.Multiply(muggle::vec4f(1.3f, 1.0f, -1.0f, 1.0f));
+	muggle::vec4f light_position_in_eye = mat_view.Multiply(muggle::vec4f(1.3f, 1.0f, -5.0f, 1.0f));
 
 	// set uniform variable in shader
 	shader_program.setUniform("Light.Position", light_position_in_eye);
@@ -114,7 +114,7 @@ void Render()
 	shader_program.setUniform("Light.Ls", 1.0f, 1.0f, 1.0f);
 	shader_program.setUniform("Material.Ka", 0.1f, 0.1f, 0.1f);
 	shader_program.setUniform("Material.Kd", 1.0f, 1.0f, 1.0f);
-	shader_program.setUniform("Material.Ks", 0.2f, 0.2f, 0.2f);
+	shader_program.setUniform("Material.Ks", 0.1f, 0.1f, 0.1f);
 	shader_program.setUniform("Material.Shininess", 100.0f);
 
 	shader_program.setUniform("ModelViewMatrix", mat_mv);
@@ -125,8 +125,15 @@ void Render()
 	shader_program.setTexture("NormalTex", p_tex_normal, 1);
 
 	glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &shade_model_index);
-	int index_type = (p_mesh->size_index == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT);
-	glDrawElements(GL_TRIANGLES, p_mesh->num_index, index_type, (GLvoid*)NULL);
+	if (p_mesh->num_index > 0)
+	{
+		int index_type = (p_mesh->size_index == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT);
+		glDrawElements(GL_TRIANGLES, p_mesh->num_index, index_type, (GLvoid*)NULL);
+	}
+	else
+	{
+		glDrawArrays(GL_TRIANGLES, 0, p_mesh->num_vertex);
+	}
 }
 void Destroy()
 {
@@ -176,6 +183,8 @@ void PrepareData()
 
 	// load mesh
 	p_mesh = muggle::GeometryMesh::GeneratePlane(2.0f, 2.0f);
+	// p_mesh = muggle::GeometryMesh::GenerateSphere(1.0f, 30, 30);
+	// p_mesh = muggle::GeometryMesh::GenerateTorus(1.0, 0.3f, 30, 30);
 	MeshDataPrint(p_mesh);
 
 	CreateVBO();
@@ -214,7 +223,7 @@ void PrepareShader()
 			MASSERT(0);
 		}
 	}
-	shade_model_index = shade_model[GTSM_Diffuse];
+	shade_model_index = shade_model[GTSM_DiffuseAndNormal];
 }
 
 void CreateVBO()

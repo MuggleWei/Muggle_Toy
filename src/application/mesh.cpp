@@ -421,7 +421,7 @@ MeshData* GeometryMesh::GeneratePlane(float len, float width)
 	 *  (-w, -l) 0 - 1 (w, -l)
 	 *
 	 */
-	float *pos, *norm, *tex_coord, *tangent, *binormal;
+	float *pos, *norm, *tex_coord;
 	intptr_t p_vert;
 
 	// vertex 0
@@ -494,6 +494,186 @@ MeshData* GeometryMesh::GeneratePlane(float len, float width)
 
 	return p_mesh_data;
 }
+MeshData* GeometryMesh::GenerateCuboid(float len, float width, float height)
+{
+	float half_l = len / 2.0f;
+	float half_w = width / 2.0f;
+	float half_h = height / 2.0f;
+
+	float pos[] = 
+	{
+		// front
+		-half_w, -half_h, -half_l,	// left down front
+		half_w, -half_h, -half_l,	// right down front 
+		half_w, half_h, -half_l, 	// right up front
+		-half_w, -half_h, -half_l,	// left down front
+		half_w, half_h, -half_l, 	// right up front
+		-half_w, half_h,-half_l, 	// left up front
+
+		// back
+		half_w, -half_h, half_l, 	// right down back
+		-half_w, -half_h, half_l, 	// left down back 
+		-half_w, half_h, half_l, 	// left up back
+		half_w, -half_h, half_l, 	// right down back
+		-half_w, half_h, half_l, 	// left up back
+		half_w, half_h, half_l,		// right up back
+
+		// top
+		-half_w, half_h, -half_l,	// left up front
+		half_w, half_h, -half_l, 	// right up front
+		half_w, half_h, half_l,		// right up back
+		-half_w, half_h, -half_l, 	// left up front
+		half_w, half_h, half_l,		// right up back
+		-half_w, half_h, half_l,	// left up back
+
+		// down
+		-half_w, -half_h, half_l,	// left down back
+		half_w, -half_h, half_l,	// right down back
+		half_w, -half_h, -half_l,	// right down front
+		-half_w, -half_h, half_l,	// left down back
+		half_w, -half_h, -half_l,	// right down front
+		-half_w, -half_h, -half_l,	// left down front
+
+		// left
+		-half_w, -half_h, half_l,	// left down back
+		-half_w, -half_h, -half_l,	// left down front
+		-half_w, half_h, -half_l,	// left up front
+		-half_w, -half_h, half_l,	// left down back
+		-half_w, half_h, -half_l,	// left up front
+		-half_w, half_h, half_l,	// left up back
+
+		// right
+		half_w, -half_h, -half_l,	// right down front
+		half_w, -half_h, half_l,	// right down back
+		half_w, half_h, half_l,		// right up back
+		half_w, -half_h, -half_l,	// right down front
+		half_w, half_h, half_l,		// right up back
+		half_w, half_h, -half_l,	// right up front
+	};
+
+	float norm[] =
+	{
+		0.0f, 0.0f, -1.0f,	// front
+		0.0f, 0.0f, -1.0f,
+		0.0f, 0.0f, -1.0f,
+		0.0f, 0.0f, -1.0f,
+		0.0f, 0.0f, -1.0f,
+		0.0f, 0.0f, -1.0f,
+
+		0.0f, 0.0f, 1.0f,	// back
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+
+		0.0f, 1.0f, 0.0f,	// top
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+
+		0.0f, -1.0f, 0.0f,	// back
+		0.0f, -1.0f, 0.0f,
+		0.0f, -1.0f, 0.0f,
+		0.0f, -1.0f, 0.0f,
+		0.0f, -1.0f, 0.0f,
+		0.0f, -1.0f, 0.0f,
+
+		-1.0f, 0.0f, 0.0f,	// left
+		-1.0f, 0.0f, 0.0f,
+		-1.0f, 0.0f, 0.0f,
+		-1.0f, 0.0f, 0.0f,
+		-1.0f, 0.0f, 0.0f,
+		-1.0f, 0.0f, 0.0f,
+
+		1.0f, 0.0f, 0.0f,	// right
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+	};
+
+	float uv[] =
+	{
+		0.0f, 0.0f,	// front
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+
+		0.0f, 0.0f,	// back
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+
+		0.0f, 0.0f,	// top
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+
+		0.0f, 0.0f,	// down
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+
+		0.0f, 0.0f,	// left
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+
+		0.0f, 0.0f,	// right
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+	};
+
+	MeshData *p_mesh_data = new MeshData();
+	p_mesh_data->vertex_decl.Add(VertexAttribute::Position, 3, VertexAttributeType::Float);
+	p_mesh_data->vertex_decl.Add(VertexAttribute::Normal, 3, VertexAttributeType::Float);
+	p_mesh_data->vertex_decl.Add(VertexAttribute::Tangent, 3, VertexAttributeType::Float);
+	p_mesh_data->vertex_decl.Add(VertexAttribute::Bitangent, 3, VertexAttributeType::Float);
+	p_mesh_data->vertex_decl.Add(VertexAttribute::TexCoord0, 2, VertexAttributeType::Float);
+
+	p_mesh_data->num_vertex = 36;
+	p_mesh_data->ptr_vertices = (intptr_t)malloc(p_mesh_data->vertex_decl.stride * p_mesh_data->num_vertex);
+	intptr_t p_vert;
+	float *p_pos, *p_norm, *p_tex_coord;
+	for (int i = 0; i < p_mesh_data->num_vertex; ++i)
+	{
+		p_vert = p_mesh_data->ptr_vertices + i * p_mesh_data->vertex_decl.stride;
+		p_pos = (float*)(p_vert + p_mesh_data->vertex_decl.offsets[VertexAttribute::Position]);
+		p_norm = (float*)(p_vert + p_mesh_data->vertex_decl.offsets[VertexAttribute::Normal]);
+		p_tex_coord = (float*)(p_vert + p_mesh_data->vertex_decl.offsets[VertexAttribute::TexCoord0]);
+
+		p_pos[0] = pos[i * 3 + 0];
+		p_pos[1] = pos[i * 3 + 1];
+		p_pos[2] = pos[i * 3 + 2];
+		p_norm[0] = norm[i * 3 + 0];
+		p_norm[1] = norm[i * 3 + 1];
+		p_norm[2] = norm[i * 3 + 2];
+		p_tex_coord[0] = uv[i * 2 + 0];
+		p_tex_coord[1] = uv[i * 2 + 1];
+	}
+
+	// generate tangent and bitangent
+	ComputeTangentAndBitangent(p_mesh_data);
+
+	return p_mesh_data;
+}
 MeshData* GeometryMesh::GenerateSphere(float radius, unsigned int rings, unsigned int segments)
 {
 	// init mesh data
@@ -505,7 +685,7 @@ MeshData* GeometryMesh::GenerateSphere(float radius, unsigned int rings, unsigne
 	p_mesh_data->vertex_decl.Add(VertexAttribute::TexCoord0, 2, VertexAttributeType::Float);
 
 	p_mesh_data->num_vertex = rings * segments;
-	p_mesh_data->num_index = rings * segments * 6;
+	p_mesh_data->num_index = (rings - 1) * (segments - 1) * 6;
 	p_mesh_data->size_index = 2;
 	p_mesh_data->ptr_vertices = (intptr_t)malloc(p_mesh_data->vertex_decl.stride * p_mesh_data->num_vertex);
 	p_mesh_data->ptr_indices = (intptr_t)malloc(p_mesh_data->size_index * p_mesh_data->num_index);
@@ -778,9 +958,9 @@ bool ComputeTangentAndBitangent(MeshData* p_mesh_data)
 		for (int i = 0; i < p_mesh_data->num_vertex / 3; ++i)
 		{
 			MASSERT_MSG(i < p_mesh_data->num_vertex / 3, "i beyond the range");
-			intptr_t p_vert0 = p_mesh_data->ptr_vertices + i * p_mesh_data->vertex_decl.stride;
-			intptr_t p_vert1 = p_mesh_data->ptr_vertices + (i + 1) * p_mesh_data->vertex_decl.stride;
-			intptr_t p_vert2 = p_mesh_data->ptr_vertices + (i + 2) * p_mesh_data->vertex_decl.stride;
+			intptr_t p_vert0 = p_mesh_data->ptr_vertices + 3 * i * p_mesh_data->vertex_decl.stride;
+			intptr_t p_vert1 = p_mesh_data->ptr_vertices + (3 * i + 1) * p_mesh_data->vertex_decl.stride;
+			intptr_t p_vert2 = p_mesh_data->ptr_vertices + (3 * i + 2) * p_mesh_data->vertex_decl.stride;
 
 			ComputeTangentAndBitangent(p_mesh_data, p_vert0, p_vert1, p_vert2);
 		}

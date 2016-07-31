@@ -11,6 +11,10 @@ Image* Image::Load(const char* file_name)
 	{
 		return LoadImagePng(file_name);
 	}
+	else if (StrUtils_EndsWith(file_name, "jpg") || StrUtils_EndsWith(file_name, "JPG"))
+	{
+		return nullptr;
+	}
 
 	return nullptr;
 }

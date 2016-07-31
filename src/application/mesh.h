@@ -75,6 +75,7 @@ class MG_DLL GeometryMesh
 {
 public:
 	static MeshData* GeneratePlane(float len, float width);
+	static MeshData* GenerateCuboid(float len, float width, float height);
 	static MeshData* GenerateSphere(float radius, unsigned int rings, unsigned int segments);
 	static MeshData* GenerateTorus(float outer_radius, float inner_radius, int nsides, int nrings);
 };

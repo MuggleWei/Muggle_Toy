@@ -33,6 +33,7 @@ void main()
 	
 	// matrix for transform from eye space to tangent space 
 	// note1: glsl matrix is column major order
+	// note2: after this transform, coordinate space become right hand 
 	mat3 toObjectLocal = mat3(
 		Tangent.x, Bitangent.x, Normal.x, 
 		Tangent.y, Bitangent.y, Normal.y, 

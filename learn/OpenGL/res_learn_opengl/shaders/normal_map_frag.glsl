@@ -79,7 +79,7 @@ vec4 diffuseNormalModel()
 	// specular
 	vec3 spec = Light.Ls * Material.Ks * pow(HDotN, Material.Shininess);
 	
-	return vec4(ambient + diffuse + spec, 1.0);
+	return vec4(ambient + diffuse + spec, 1.0);	
 }
 
 void main()

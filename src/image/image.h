@@ -24,7 +24,8 @@ ENUM_STRUCT(ImageBitDepth, FOREACH_ENUM_IMAGE_BIT_DEPTH)
 #define FOREACH_ENUM_IMAGE_FILE_FORMAT(_) \
 	_(PNG) \
 	_(TGA) \
-	_(DDS)
+	_(DDS) \
+	_(JPG)
 ENUM_STRUCT(ImageFileFormat, FOREACH_ENUM_IMAGE_FILE_FORMAT)
 
 class Image

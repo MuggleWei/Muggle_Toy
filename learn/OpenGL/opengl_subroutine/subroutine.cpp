@@ -108,13 +108,27 @@ void Render()
 	int index_type = (p_mesh->size_index == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT);
 
 	glUniformSubroutinesuiv(GL_VERTEX_SHADER, 1, &lambertModelIndex);
-	glDrawElements(GL_TRIANGLES, p_mesh->num_index, index_type, (GLvoid*)NULL);
+	if (p_mesh->num_index > 0)
+	{
+		glDrawElements(GL_TRIANGLES, p_mesh->num_index, index_type, (GLvoid*)NULL);
+	}
+	else
+	{
+		glDrawArrays(GL_TRIANGLES, 0, p_mesh->num_vertex);
+	}
 
 	shader_program.setUniform("ModelViewMatrix", mat_mv2);
 	shader_program.setUniform("NormalMatrix", mat_normal2);
 	shader_program.setUniform("MVP", mat_mvp2);
 	glUniformSubroutinesuiv(GL_VERTEX_SHADER, 1, &phongModelIndex);
-	glDrawElements(GL_TRIANGLES, p_mesh->num_index, index_type, (GLvoid*)NULL);
+	if (p_mesh->num_index > 0)
+	{		
+		glDrawElements(GL_TRIANGLES, p_mesh->num_index, index_type, (GLvoid*)NULL);
+	}
+	else
+	{
+		glDrawArrays(GL_TRIANGLES, 0, p_mesh->num_vertex);
+	}
 }
 void Destroy()
 {
@@ -207,7 +221,7 @@ void CreateVAO()
 	glEnableVertexAttribArray(0);		// vertex position
 	glEnableVertexAttribArray(1);		// vertex normal
 
-										// map attribute index to buffer
+	// map attribute index to buffer
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_handles[VBO_Vertex]);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
 		p_mesh->vertex_decl.stride, (void*)p_mesh->vertex_decl.offsets[muggle::VertexAttribute::Position]);
