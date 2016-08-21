@@ -96,7 +96,10 @@ void Render()
 	shader_program.setUniform("NormalMatrix", mat_normal);
 	shader_program.setUniform("MVP", mat_mvp);
 
-	shader_program.setTexture("DiffuseTex", p_tex, 0);
+	if (p_tex)
+	{
+		shader_program.setTexture("DiffuseTex", p_tex, 0);
+	}	
 
 	if (p_mesh->num_index > 0)
 	{

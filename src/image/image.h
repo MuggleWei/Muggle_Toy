@@ -17,7 +17,8 @@ ENUM_STRUCT(ImageColorType, FOREACH_ENUM_IMAGE_COLOR_TYPE)
 	_(u8x3) \
 	_(u8x4) \
 	_(u16x3) \
-	_(u16x4)
+	_(u16x4) \
+	_(fx3)
 ENUM_STRUCT(ImageBitDepth, FOREACH_ENUM_IMAGE_BIT_DEPTH)
 
 //
@@ -25,7 +26,8 @@ ENUM_STRUCT(ImageBitDepth, FOREACH_ENUM_IMAGE_BIT_DEPTH)
 	_(PNG) \
 	_(TGA) \
 	_(DDS) \
-	_(JPG)
+	_(JPG) \
+	_(RGBE)
 ENUM_STRUCT(ImageFileFormat, FOREACH_ENUM_IMAGE_FILE_FORMAT)
 
 class Image
@@ -48,6 +50,7 @@ public:
 
 protected:
 	static Image* LoadImagePng(const char* file_name);
+	static Image* LoadImageHDR(const char* file_name);
 
 protected:
 	char m_file_path[MG_MAX_PATH];

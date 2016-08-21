@@ -2,6 +2,7 @@
 #include "str_utils.h"
 #include "file_utility.h"
 #include "image_utils_png.h"
+#include "image_utils_rgbe.h"
 
 NS_MUGGLE_BEGIN
 
@@ -13,7 +14,12 @@ Image* Image::Load(const char* file_name)
 	}
 	else if (StrUtils_EndsWith(file_name, "jpg") || StrUtils_EndsWith(file_name, "JPG"))
 	{
+		MWARNING(0, "Don't support jpg format yet, to be continued...");
 		return nullptr;
+	}
+	else if (StrUtils_EndsWith(file_name, "hdr") || StrUtils_EndsWith(file_name, "HDR"))
+	{
+		return LoadImageHDR(file_name);
 	}
 
 	return nullptr;
@@ -72,6 +78,10 @@ uint32_t Image::getPixelSize()
 	{
 		return 8;
 	}break;
+	case ImageBitDepth::Enum::fx3:
+	{
+		return 12;
+	}
 	}
 
 	MERROR(0, "Something must be wrong!");
@@ -86,7 +96,9 @@ void Image::CorrectTexCoord(bool is_opengl)
 {
 	if (is_opengl)
 	{
-		if (m_file_format == ImageFileFormat::Enum::PNG)
+		if (m_file_format == ImageFileFormat::Enum::PNG ||
+			m_file_format == ImageFileFormat::Enum::RGBE
+			)
 		{
 			uint32_t rowbytes = m_width * getPixelSize();
 			unsigned char* buf = (unsigned char*)malloc(rowbytes * m_height);
@@ -243,6 +255,45 @@ Image* Image::LoadImagePng(const char* file_name)
 
 	// png file destroy
 	ImageUtils_Png_Destroy(png_ptr, info_ptr);
+
+	// close file
+	File_CloseHandle(file_handle);
+
+	return image;
+}
+Image* Image::LoadImageHDR(const char* file_name)
+{
+	// get file handle
+	char file_path_buffer[MG_MAX_PATH];
+	File_GetAbsolutePath(file_name, file_path_buffer);
+	void* file_handle = File_GetHandle(file_path_buffer, "rb");
+	if (!file_handle)
+	{
+		MWARNING(0, "Failed in load image from file %s", file_name);
+		return nullptr;
+	}
+
+	RGBE_Header rgbe_header;
+	bool ret = muggle::ImageUtils_RGBE_ReadHeader(file_handle, &rgbe_header);
+	if (!ret)
+	{
+		MWARNING(0, "Failed parse image from file %s", file_name);
+		return nullptr;
+	}
+	void* pixels = muggle::ImageUtils_RGBE_ReadData(file_handle, &rgbe_header);
+
+	Image* image = nullptr;
+	if (pixels != nullptr)
+	{
+		image = new Image();
+		memcpy(image->m_file_path, file_name, strlen(file_path_buffer));
+		image->m_width = rgbe_header.width;
+		image->m_height = rgbe_header.height;
+		image->m_color_type = ImageColorType::Enum::RGB;
+		image->m_bit_depth = ImageBitDepth::Enum::fx3;
+		image->m_file_format = ImageFileFormat::Enum::RGBE;
+		image->m_data = (unsigned char*)pixels;
+	}
 
 	// close file
 	File_CloseHandle(file_handle);

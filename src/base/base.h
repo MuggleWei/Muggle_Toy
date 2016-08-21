@@ -33,12 +33,16 @@
 #endif
 #endif
 
+// log
+#define MLOG(format, ...) LogFunction(format, ##__VA_ARGS__)
+
 // assert
 #if MUGGLE_RELEASE
 #define MASSERT(x)
 #define MASSERT_MSG(x, format, ...)
 #define MERROR(x, format, ...)
 #define MWARNING(x, format, ...)
+#define MDebugLog(format, ...)
 #else
 #define MASSERT(x) \
 do \
@@ -65,6 +69,7 @@ do \
 		ExportWarning(#x, __FILE__, __LINE__, format, ##__VA_ARGS__);  \
 	} \
 } while(0)
+#define MDebugLog(format, ...) LogFunction(format, ##__VA_ARGS__)
 #endif
 
 // lib and dll
@@ -111,9 +116,6 @@ do \
 #define EXTERN_C_BEGIN
 #define EXTERN_C_END
 #endif
-
-// log
-#define MLOG(format, ...) LogFunction(format, ##__VA_ARGS__)
 
 // sleep
 #define MSleep(ms) SleepFunction(ms)

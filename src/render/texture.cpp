@@ -26,6 +26,29 @@ int32_t ColorTypeToGLInternalFormat(ImageColorType::Enum color_type)
 
 	return gl_internal_format;
 }
+GLenum ImageBitDepthToGLPixelType(ImageBitDepth::Enum bit_depth)
+{
+	GLenum gl_pixel_type = GL_UNSIGNED_BYTE;
+	switch (bit_depth)
+	{
+	case ImageBitDepth::Enum::u8x3:
+	case ImageBitDepth::Enum::u8x4:
+	{
+		gl_pixel_type = GL_UNSIGNED_BYTE;
+	}break;
+	case ImageBitDepth::Enum::u16x3:
+	case ImageBitDepth::Enum::u16x4:
+	{
+		gl_pixel_type = GL_UNSIGNED_SHORT;
+	}break;
+	case ImageBitDepth::Enum::fx3:
+	{
+		gl_pixel_type = GL_FLOAT;
+	}break;
+	}
+
+	return gl_pixel_type;
+}
 
 Texture* Texture::Load(const char* file_name, TextureType::Enum tex_type)
 {
@@ -126,10 +149,11 @@ void Texture::GenGPUInfo()
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 		GLint texture_format = ColorTypeToGLInternalFormat(m_image->getColorType());
+		GLenum pixel_type = ImageBitDepthToGLPixelType(m_image->getBitDepth());
 
 		glTexImage2D(GL_TEXTURE_2D, 0, texture_format,
 			m_image->getWidth(), m_image->getHeight(),
-			0, texture_format, GL_UNSIGNED_BYTE, m_image->getData());
+			0, texture_format, pixel_type, m_image->getData());
 
 		// TODO: this need to be config in texture member variable
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -167,9 +191,11 @@ void Texture::GenGPUInfo()
 			{
 				// m_cube_image[i]->CorrectTexCoord(true);
 				GLint texture_format = ColorTypeToGLInternalFormat(m_cube_image[i]->getColorType());
+				GLenum pixel_type = ImageBitDepthToGLPixelType(m_cube_image[i]->getBitDepth());
+
 				glTexImage2D(targets[i], 0, texture_format,
 					m_cube_image[i]->getWidth(), m_cube_image[i]->getHeight(),
-					0, texture_format, GL_UNSIGNED_BYTE, m_cube_image[i]->getData());
+					0, texture_format, pixel_type, m_cube_image[i]->getData());
 			}
 
 			// TODO: this need to be config in texture member variable

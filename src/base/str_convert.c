@@ -1,6 +1,6 @@
-#include "string_convert.h"
+#include "str_convert.h"
 
-bool StringConvert_atoi(char* ptr_ch, int* ptr_i)
+bool StrConvert_atoi(char* ptr_ch, int* ptr_i)
 {
 	char *p = ptr_ch;
 	int sign = 1;
