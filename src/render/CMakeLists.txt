@@ -2,16 +2,22 @@ file(GLOB HEADER ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
 file(GLOB SOURCE_C ${CMAKE_CURRENT_SOURCE_DIR}/*.c)
 file(GLOB SOURCE_CPP ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
-if (WIN32)
+if (${MUGGLE_TOY_USE_DX11})
 	if(${CMAKE_SYSTEM_VERSION} LESS 6.2) # version < win8
 		include_directories(
-			$ENV{DXSDK_DIR}Include
+			${DirectX_D3DX11_INCLUDE_DIR}
 		)
 		link_directories(
-			$ENV{DXSDK_DIR}Lib/${MG_ARCHITECTURE}
-		)
+			${DirectX_D3DX11_INCLUDE_DIR}/../Lib/${MG_ARCHITECTURE}
+		)	
 	endif()
+else()	
+	# exclude dx file
+	list(REMOVE_ITEM SOURCE_CPP "${CMAKE_CURRENT_SOURCE_DIR}/renderer_d3d11.cpp")
+	list(REMOVE_ITEM HEADER "${CMAKE_CURRENT_SOURCE_DIR}/renderer_d3d11.h")
+endif()
 
+if (WIN32)
 	add_library(${muggle_render_lib} ${MG_LIB_TYPE}
 		${HEADER}
 		${SOURCE_C}

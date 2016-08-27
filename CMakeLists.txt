@@ -19,6 +19,21 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
 	add_definitions(-DMG_PLATFORM_WINDOWS=1)
 endif()
 
+# set cmake module path
+set (CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+message("## start search dx package")
+find_package(DirectX)
+message("## finish search dx package")
+
+# Graphic API macro
+if (${DirectX_D3DX11_FOUND})
+	set(MUGGLE_TOY_USE_DX11 ON)
+	add_definitions(-DMG_ENABLE_DX11=1)
+else()
+	set(MUGGLE_TOY_USE_DX11 OFF)
+	add_definitions(-DMG_ENABLE_DX11=0)
+endif()	
+
 # set output directory
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

@@ -1,5 +1,9 @@
 option(MUGGLE_TOY_BUILD_LEARN_OPENGL "Build sample code" ON)
-option(MUGGLE_TOY_BUILD_LEARN_D3D11 "Build sample code" ON)
+if (${MUGGLE_TOY_USE_DX11})
+	option(MUGGLE_TOY_BUILD_LEARN_D3D11 "Build sample code" ON)
+else()
+	option(MUGGLE_TOY_BUILD_LEARN_D3D11 "Build sample code" OFF)
+endif()
 
 if (${MUGGLE_TOY_BUILD_LEARN_OPENGL})
 	add_subdirectory(OpenGL)
