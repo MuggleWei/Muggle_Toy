@@ -1,1 +1,0 @@
-python "%~dp0consistent_res.py" %1 %2

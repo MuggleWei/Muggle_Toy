@@ -161,9 +161,9 @@ endfunction(sample_code)
 # function for keep files consistent
 function(consistent_files fake_proj_name source_dir target_dir target_name)	
 	if (WIN32)
-		set(custom_consistent_res_command "${CMAKE_SOURCE_DIR}/consistent_res.bat")
+		set(custom_consistent_res_command "${CMAKE_SOURCE_DIR}/sync_dir.bat")
 	else()
-		set(custom_consistent_res_command "${CMAKE_SOURCE_DIR}/consistent_res.sh")
+		set(custom_consistent_res_command "${CMAKE_SOURCE_DIR}/sync_dir.sh")
 	endif()
 
 	# keep resources consistent
