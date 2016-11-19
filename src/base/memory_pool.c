@@ -56,13 +56,21 @@ uintptr_t MemoryPoolAlloc(MemoryPool* pool)
 #endif
 
 	uintptr_t ret = pool->memory_pool_ptr_buf[pool->alloc_index];
-	pool->alloc_index = (pool->alloc_index + 1) % pool->capacity;
+	++pool->alloc_index;
+	if (pool->alloc_index == pool->capacity)
+	{
+		pool->alloc_index = 0;
+	}
 	return ret;
 }
 void MemoryPoolFree(MemoryPool* pool, void* p_data)
 {
 	pool->memory_pool_ptr_buf[pool->free_index] = (uintptr_t)p_data;
-	pool->free_index = (pool->free_index + 1) % pool->capacity;
+	++pool->free_index;
+	if (pool->free_index == pool->capacity)
+	{
+		pool->free_index = 0;
+	}
 	--pool->used;
 }
 
